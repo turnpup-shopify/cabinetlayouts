@@ -1,0 +1,474 @@
+{% doc %}
+  @prompt
+    Slideshow component with dots at the bottom that has a simple social call out in bottom right to feature several cabinet designs. On desktop should be 3 side by side images with no spacing in between and no padding around module. On mobile it sohuld be 1 about 80% of screenwidth with the next 2 directly after with no spacing in between. 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-slideshow-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ai-slideshow-track-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-slideshow-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-slideshow-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .ai-slideshow-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-slideshow-controls-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .ai-slideshow-dot-{{ ai_gen_id }} {
+    width: {{ block.settings.dot_size }}px;
+    height: {{ block.settings.dot_size }}px;
+    border-radius: 50%;
+    background-color: {{ block.settings.dot_color }};
+    opacity: 0.5;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    padding: 0;
+  }
+
+  .ai-slideshow-dot-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-slideshow-dot-{{ ai_gen_id }}.active {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  .ai-slideshow-social-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 3;
+    background-color: {{ block.settings.social_bg_color }};
+    padding: 12px 16px;
+    border-radius: {{ block.settings.social_border_radius }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ai-slideshow-social-text-{{ ai_gen_id }} {
+    color: {{ block.settings.social_text_color }};
+    font-size: {{ block.settings.social_text_size }}px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .ai-slideshow-social-links-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+  }
+
+  .ai-slideshow-social-link-{{ ai_gen_id }} {
+    color: {{ block.settings.social_icon_color }};
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-slideshow-social-link-{{ ai_gen_id }}:hover {
+    opacity: 0.7;
+  }
+
+  .ai-slideshow-social-link-{{ ai_gen_id }} svg {
+    width: {{ block.settings.social_icon_size }}px;
+    height: {{ block.settings.social_icon_size }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-slideshow-track-{{ ai_gen_id }} {
+      gap: 0;
+    }
+
+    .ai-slideshow-slide-{{ ai_gen_id }} {
+      width: calc(100% / 3);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-slideshow-track-{{ ai_gen_id }} {
+      gap: 0;
+    }
+
+    .ai-slideshow-slide-{{ ai_gen_id }} {
+      width: 80%;
+    }
+
+    .ai-slideshow-social-{{ ai_gen_id }} {
+      bottom: 15px;
+      right: 15px;
+      padding: 10px 12px;
+    }
+
+    .ai-slideshow-social-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.social_text_size | times: 0.9 }}px;
+    }
+
+    .ai-slideshow-social-link-{{ ai_gen_id }} svg {
+      width: {{ block.settings.social_icon_size | times: 0.9 }}px;
+      height: {{ block.settings.social_icon_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<cabinet-slideshow-{{ ai_gen_id }} class="ai-slideshow-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-slideshow-track-{{ ai_gen_id }}">
+    {% for i in (1..6) %}
+      {% liquid
+        assign image_key = 'image_' | append: i
+        assign image = block.settings[image_key]
+      %}
+      <div class="ai-slideshow-slide-{{ ai_gen_id }}">
+        {% if image %}
+          <img
+            src="{{ image | image_url: width: 1200 }}"
+            alt="{{ image.alt | escape }}"
+            loading="lazy"
+            width="{{ image.width }}"
+            height="{{ image.height }}"
+          >
+        {% else %}
+          <div class="ai-slideshow-image-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+            {% if i == 1 %}
+              <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
+                Add images to showcase your cabinet designs
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="ai-slideshow-controls-{{ ai_gen_id }}">
+    {% for i in (1..6) %}
+      <button
+        class="ai-slideshow-dot-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}"
+        data-slide="{{ i | minus: 1 }}"
+        aria-label="Go to slide {{ i }}"
+      ></button>
+    {% endfor %}
+  </div>
+
+  {% if block.settings.show_social %}
+    <div class="ai-slideshow-social-{{ ai_gen_id }}">
+      {% if block.settings.social_text != blank %}
+        <p class="ai-slideshow-social-text-{{ ai_gen_id }}">{{ block.settings.social_text }}</p>
+      {% endif %}
+      <div class="ai-slideshow-social-links-{{ ai_gen_id }}">
+        {% if block.settings.instagram_url != blank %}
+          <a
+            href="{{ block.settings.instagram_url }}"
+            class="ai-slideshow-social-link-{{ ai_gen_id }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+        {% endif %}
+        {% if block.settings.pinterest_url != blank %}
+          <a
+            href="{{ block.settings.pinterest_url }}"
+            class="ai-slideshow-social-link-{{ ai_gen_id }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Pinterest"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8.5 14.5c.5 2 2 3.5 4.5 3.5 3.5 0 5.5-2.5 5.5-6 0-3-2-5.5-5-5.5-3.5 0-6 2.5-6 6 0 1.5.5 2.5 1.5 3"></path>
+            </svg>
+          </a>
+        {% endif %}
+        {% if block.settings.facebook_url != blank %}
+          <a
+            href="{{ block.settings.facebook_url }}"
+            class="ai-slideshow-social-link-{{ ai_gen_id }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</cabinet-slideshow-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CabinetSlideshow{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 0;
+        this.isDesktop = window.innerWidth >= 750;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-slideshow-track-{{ ai_gen_id }}');
+        this.dots = this.querySelectorAll('.ai-slideshow-dot-{{ ai_gen_id }}');
+        this.slides = this.querySelectorAll('.ai-slideshow-slide-{{ ai_gen_id }}');
+        this.totalSlides = this.slides.length;
+
+        this.setupEventListeners();
+        this.updateSlidePosition();
+
+        window.addEventListener('resize', () => {
+          const wasDesktop = this.isDesktop;
+          this.isDesktop = window.innerWidth >= 750;
+          if (wasDesktop !== this.isDesktop) {
+            this.updateSlidePosition();
+          }
+        });
+      }
+
+      setupEventListeners() {
+        this.dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            const slideIndex = parseInt(e.currentTarget.getAttribute('data-slide'));
+            this.goToSlide(slideIndex);
+          });
+        });
+      }
+
+      goToSlide(index) {
+        this.currentSlide = index;
+        this.updateSlidePosition();
+        this.updateDots();
+      }
+
+      updateSlidePosition() {
+        if (this.isDesktop) {
+          const offset = -(this.currentSlide * (100 / 3));
+          this.track.style.transform = 'translateX(' + offset + '%)';
+        } else {
+          const offset = -(this.currentSlide * 80);
+          this.track.style.transform = 'translateX(' + offset + '%)';
+        }
+      }
+
+      updateDots() {
+        this.dots.forEach((dot, index) => {
+          if (index === this.currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+    }
+
+    customElements.define('cabinet-slideshow-{{ ai_gen_id }}', CabinetSlideshow{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cabinet slideshow",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "Image 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "Image 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "Image 6"
+    },
+    {
+      "type": "header",
+      "content": "Navigation dots"
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 6,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "label": "Dot size",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Dot color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Social callout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social callout",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "social_text",
+      "label": "Text",
+      "default": "Follow Us"
+    },
+    {
+      "type": "range",
+      "id": "social_text_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "social_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "social_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "social_icon_color",
+      "label": "Icon color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "social_icon_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "social_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "pinterest_url",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cabinet slideshow"
+    }
+  ]
+}
+{% endschema %}

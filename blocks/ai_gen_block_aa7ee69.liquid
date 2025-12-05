@@ -1,0 +1,380 @@
+{% doc %}
+  @prompt
+    A bank of blog images that are rotating on the homepage all from a particular blog that is selectable in the block and with a particular tag. Each image is clickable to that blog., make each article a floating image that is bouncing slowly between the edges of the box. The whole module should b e 80% of screen height, They should all start in different parts of the section. Maybe generate a random number for the x and y axis to start the tiles, that didnt work , each block shoul dstart in a different part of the secion so they arent on top of one another
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .floating-blog-images-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .floating-blog-image-{{ ai_gen_id }} {
+    position: absolute;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .floating-blog-image-{{ ai_gen_id }}:hover {
+    transform: scale(1.05);
+    z-index: 100;
+  }
+
+  .floating-blog-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;}
+
+  .floating-blog-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;}
+
+  .floating-blog-image-placeholder-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.5;
+  }
+
+  .floating-blog-image-title-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: {{ block.settings.title_background_color }};
+    color: {{ block.settings.title_color }};
+    padding: 10px;
+    font-size: {{ block.settings.title_size }}px;
+    opacity: {{ block.settings.title_opacity | divided_by: 100.0 }};
+    transition: opacity 0.3s ease;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .floating-blog-image-{{ ai_gen_id }}:hover .floating-blog-image-title-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .no-articles-message-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: {{ block.settings.title_color }};
+    background: {{ block.settings.title_background_color }};
+    padding: 20px;
+    border-radius:8px;
+    width: 80%;
+    max-width: 400px;}
+
+  @media screen and (max-width: 749px) {
+    .floating-blog-image-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;padding: 8px;
+    }
+  }
+{% endstyle %}
+
+<floating-blog-container-{{ ai_gen_id }} class="floating-blog-images-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.blog != blank %}
+    {% assign filtered_articles = block.settings.blog.articles %}
+    {% if block.settings.tag != blank %}
+      {% assign filtered_articles = block.settings.blog.articles | where: "tags", block.settings.tag %}
+    {% endif %}
+    
+    {% if filtered_articles.size > 0 %}
+      {% for article in filtered_articles limit: block.settings.max_articles %}
+        {% assign random_size = forloop.index | times: 13 | modulo: 3 %}
+        {% case random_size %}
+          {% when 0 %}
+            {% assign image_size = block.settings.image_size_min %}
+          {% when 1 %}
+            {% assign image_size = block.settings.image_size_min | plus: block.settings.image_size_max | divided_by: 2 %}
+          {% when 2 %}
+            {% assign image_size = block.settings.image_size_max %}{% endcase %}<a 
+          href="{{ article.url }}" 
+          class="floating-blog-image-{{ ai_gen_id }}"
+          data-index="{{ forloop.index0 }}"
+          data-article-id="{{ article.id }}"
+          style="
+            width: {{ image_size }}px; 
+            height: {{ image_size }}px;
+            z-index: {{ forloop.index }};
+          "
+        >
+          {% if article.image %}
+            <img
+              src="{{ article.image | image_url: width: 500 }}"
+              alt="{{ article.title | escape }}"
+              loading="lazy">
+          {% else %}
+            <div class="floating-blog-image-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+          
+          {% if block.settings.show_title %}
+            <div class="floating-blog-image-title-{{ ai_gen_id }}">
+              {{ article.title }}
+            </div>
+          {% endif %}
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="no-articles-message-{{ ai_gen_id }}">
+        <h3>No articles found with the selected tag</h3>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="no-articles-message-{{ ai_gen_id }}">
+      <h3>Please select a blog</h3>
+    </div>
+  {% endif %}
+</floating-blog-container-{{ ai_gen_id }}><script>
+  (function() {
+    class FloatingBlogContainer extends HTMLElement {
+      constructor() {
+        super();
+        this.animationFrameId = null;
+        this.images = [];
+      }
+
+      connectedCallback() {
+        this.initializeImages();
+        this.startAnimation();
+      }
+
+      disconnectedCallback() {
+        if (this.animationFrameId) {
+          cancelAnimationFrame(this.animationFrameId);
+        }
+      }
+
+      initializeImages() {
+        const imageElements = this.querySelectorAll('.floating-blog-image-{{ ai_gen_id }}');
+        const containerRect = this.getBoundingClientRect();
+        
+        imageElements.forEach((element, index) => {
+          const imageRect = element.getBoundingClientRect();
+          const articleId = parseInt(element.dataset.articleId, 10);
+          
+          // Create a more distributed starting position using golden ratio
+          const goldenRatio = 1.618;
+          const angle = index * goldenRatio * Math.PI * 2;
+          const radius = Math.min(containerRect.width, containerRect.height) * 0.3;
+          
+          // Calculate initial position with some randomness based on article ID
+          const centerX = containerRect.width / 2;
+          const centerY = containerRect.height / 2;
+          const seedX = (articleId * 17 + index * 23) % 100;
+          const seedY = (articleId * 31 + index * 41) % 100;
+          
+          const startX = Math.max(0, Math.min(
+            containerRect.width - imageRect.width,
+            centerX + Math.cos(angle) * radius + (seedX - 50) * 2
+          ));
+          const startY = Math.max(0, Math.min(
+            containerRect.height - imageRect.height,
+            centerY + Math.sin(angle) * radius + (seedY - 50) * 2
+          ));
+          
+          // Random velocity
+          const velocityX = ((articleId * 13 + index * 19) % 100 - 50) / 100;
+          const velocityY = ((articleId * 37 + index * 43) % 100 - 50) / 100;
+          
+          this.images.push({
+            element: element,
+            x: startX,
+            y: startY,
+            velocityX: velocityX,
+            velocityY: velocityY,
+            width: imageRect.width,
+            height: imageRect.height
+          });
+          
+          // Set initial position
+          element.style.left = startX + 'px';
+          element.style.top = startY + 'px';
+        });
+      }
+
+      startAnimation() {
+        const animate = () => {
+          const containerRect = this.getBoundingClientRect();
+          
+          this.images.forEach(image => {
+            // Update position
+            image.x += image.velocityX;
+            image.y += image.velocityY;
+            
+            // Bounce off walls
+            if (image.x <= 0 || image.x >= containerRect.width - image.width) {
+              image.velocityX *= -1;
+              image.x = Math.max(0, Math.min(containerRect.width - image.width, image.x));
+            }
+            
+            if (image.y <= 0 || image.y >= containerRect.height - image.height) {
+              image.velocityY *= -1;
+              image.y = Math.max(0, Math.min(containerRect.height - image.height, image.y));
+            }
+            
+            // Apply position
+            image.element.style.left = image.x + 'px';
+            image.element.style.top = image.y + 'px';
+          });
+          
+          this.animationFrameId = requestAnimationFrame(animate);
+        };
+        
+        animate();
+      }
+    }
+
+    customElements.define('floating-blog-container-{{ ai_gen_id }}', FloatingBlogContainer);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Floating Blog Images",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Blog Selection"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "Filter by tag",
+      "info": "Leave empty to show all articles from the selected blog"
+    },
+    {
+      "type": "range",
+      "id": "max_articles",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "label": "Maximum articles to show",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Visual Settings"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Container border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Image border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "image_size_min",
+      "min": 100,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Minimum image size",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "image_size_max",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Maximum image size",
+      "default": 250
+    },
+    {
+      "type": "header",
+      "content": "Title Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show article title",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_background_color",
+      "label": "Title background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "title_opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Title background opacity",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Floating Blog Images"
+    }
+  ]
+}
+{% endschema %}
