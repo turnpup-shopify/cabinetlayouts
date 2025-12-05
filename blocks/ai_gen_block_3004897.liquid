@@ -138,6 +138,11 @@
     .ai-slideshow-slide-{{ ai_gen_id }} {
       width: calc(100% / 3);
     }
+
+    /* Hide two trailing dots on desktop to match available end positions */
+    .ai-slideshow-controls-{{ ai_gen_id }} .ai-slideshow-dot-{{ ai_gen_id }}:nth-last-child(-n + 2) {
+      display: none;
+    }
   }
 
   @media screen and (max-width: 749px) {
@@ -276,12 +281,14 @@
 
         this.setupEventListeners();
         this.updateSlidePosition();
+        this.updateDots();
 
         window.addEventListener('resize', () => {
           const wasDesktop = this.isDesktop;
           this.isDesktop = window.innerWidth >= 750;
           if (wasDesktop !== this.isDesktop) {
             this.updateSlidePosition();
+            this.updateDots();
           }
         });
       }
@@ -296,29 +303,47 @@
       }
 
       goToSlide(index) {
-        this.currentSlide = index;
+        const clampedIndex = Math.max(0, Math.min(index, this.getMaxIndex()));
+        this.currentSlide = clampedIndex;
         this.updateSlidePosition();
         this.updateDots();
       }
 
       updateSlidePosition() {
+        // Ensure we never scroll beyond the last fully filled viewport
+        this.currentSlide = Math.min(this.currentSlide, this.getMaxIndex());
+
         if (this.isDesktop) {
           const offset = -(this.currentSlide * (100 / 3));
           this.track.style.transform = 'translateX(' + offset + '%)';
         } else {
-          const offset = -(this.currentSlide * 80);
+          const maxIndex = this.getMaxIndex();
+          const atFinalSlide = this.currentSlide === maxIndex && maxIndex === this.totalSlides - 1;
+
+          // At the final mobile position, show 20% of the previous and 80% of the last image
+          const offset = atFinalSlide
+            ? -((this.currentSlide * 80) - 20)
+            : -(this.currentSlide * 80);
+
           this.track.style.transform = 'translateX(' + offset + '%)';
         }
       }
 
       updateDots() {
+        const visibleCount = this.isDesktop ? Math.max(1, this.dots.length - 2) : this.dots.length;
+
         this.dots.forEach((dot, index) => {
-          if (index === this.currentSlide) {
-            dot.classList.add('active');
-          } else {
-            dot.classList.remove('active');
-          }
+          const isVisibleDot = index < visibleCount;
+          dot.classList.toggle('active', isVisibleDot && index === this.currentSlide);
         });
+      }
+
+      getMaxIndex() {
+        if (this.isDesktop) {
+          return Math.max(0, this.totalSlides - 3);
+        }
+
+        return Math.max(0, this.totalSlides - 1);
       }
     }
 

@@ -1,0 +1,830 @@
+{% # Custom section: Cabinet layout builder %}
+
+{% liquid
+  assign initial_width = section.settings.default_cabinet_width
+  assign initial_height = section.settings.default_cabinet_height
+  assign initial_count = section.settings.initial_cabinet_count
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<section
+  id="CabinetLayout-{{ section.id }}"
+  class="section section--{{ section.settings.section_width }} spacing-style color-{{ section.settings.color_scheme }} cabinet-layout"
+  style="
+    {% render 'spacing-style', settings: section.settings %};
+    --cabinet-width: {{ initial_width }}px;
+    --cabinet-height: {{ initial_height }}px;
+    --cabinet-gap: {{ section.settings.cabinet_gap }}px;
+    --cabinet-color: {{ section.settings.default_cabinet_color }};
+    --knob-color: {{ section.settings.default_knob_color }};
+    --knob-size: {{ section.settings.default_knob_size }}px;
+  "
+>
+  <div class="cabinet-layout__shell">
+    <div class="cabinet-layout__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="cabinet-layout__eyebrow">{{ section.settings.eyebrow }}</p>
+      {% endif %}
+      {% if section.settings.heading != blank %}
+        <h2 class="cabinet-layout__title">{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p class="cabinet-layout__subtitle">{{ section.settings.subheading }}</p>
+      {% endif %}
+    </div>
+
+    <div class="cabinet-layout__content">
+      <div class="cabinet-layout__controls" data-control-panel>
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <label for="cabinet-count-{{ section.id }}">Cabinets side by side</label>
+            <span class="cabinet-layout__value" data-value="count">{{ initial_count }}</span>
+          </div>
+          <input
+            id="cabinet-count-{{ section.id }}"
+            type="range"
+            min="1"
+            max="{{ section.settings.max_cabinets }}"
+            step="1"
+            value="{{ initial_count }}"
+            data-control="count"
+          >
+        </div>
+
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <label for="cabinet-width-{{ section.id }}">Cabinet width</label>
+            <span class="cabinet-layout__value"><span data-value="width">{{ initial_width }}</span> px</span>
+          </div>
+          <input
+            id="cabinet-width-{{ section.id }}"
+            type="range"
+            min="140"
+            max="420"
+            step="5"
+            value="{{ initial_width }}"
+            data-control="width"
+          >
+        </div>
+
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <label for="cabinet-height-{{ section.id }}">Cabinet height</label>
+            <span class="cabinet-layout__value"><span data-value="height">{{ initial_height }}</span> px</span>
+          </div>
+          <input
+            id="cabinet-height-{{ section.id }}"
+            type="range"
+            min="120"
+            max="380"
+            step="5"
+            value="{{ initial_height }}"
+            data-control="height"
+          >
+        </div>
+
+        <div class="cabinet-layout__divider"></div>
+
+        <div class="cabinet-layout__control cabinet-layout__control--two-up">
+          <div class="cabinet-layout__color-control">
+            <label for="cabinet-color-{{ section.id }}">Cabinet color</label>
+            <input
+              id="cabinet-color-{{ section.id }}"
+              type="color"
+              value="{{ section.settings.default_cabinet_color }}"
+              data-control="cabinetColor"
+              aria-label="Cabinet color"
+            >
+          </div>
+
+          <div class="cabinet-layout__color-control">
+            <label for="knob-color-{{ section.id }}">Knob color</label>
+            <input
+              id="knob-color-{{ section.id }}"
+              type="color"
+              value="{{ section.settings.default_knob_color }}"
+              data-control="knobColor"
+              aria-label="Knob color"
+            >
+          </div>
+        </div>
+
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <span>Knob size</span>
+            <span class="cabinet-layout__value"><span data-value="knobSize">{{ section.settings.default_knob_size }}</span> px</span>
+          </div>
+          <input
+            type="range"
+            min="8"
+            max="38"
+            step="1"
+            value="{{ section.settings.default_knob_size }}"
+            data-control="knobSize"
+          >
+        </div>
+
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <span>Knob style</span>
+          </div>
+          <div class="cabinet-layout__segmented" role="group" aria-label="Knob style">
+            {% assign knob_shapes = "round|Round,square|Square,bar|Bar pull" | split: ',' %}
+            {% for shape in knob_shapes %}
+              {% assign parts = shape | split: '|' %}
+              {% assign shape_value = parts[0] %}
+              {% assign shape_label = parts[1] %}
+              <button
+                type="button"
+                class="cabinet-layout__pill {% if section.settings.default_knob_shape == shape_value %}is-active{% endif %}"
+                data-knob-shape="{{ shape_value }}"
+              >
+                {{ shape_label }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="cabinet-layout__control">
+          <div class="cabinet-layout__control-label">
+            <span>Knob placement</span>
+          </div>
+          <div class="cabinet-layout__segmented" role="group" aria-label="Knob placement">
+            {% assign knob_positions = "bottom-left|Bottom left,bottom-right|Bottom right,middle-left|Middle left,middle-right|Middle right" | split: ',' %}
+            {% for position in knob_positions %}
+              {% assign parts = position | split: '|' %}
+              {% assign position_value = parts[0] %}
+              {% assign position_label = parts[1] %}
+              <button
+                type="button"
+                class="cabinet-layout__pill {% if section.settings.default_knob_position == position_value %}is-active{% endif %}"
+                data-knob-position="{{ position_value }}"
+              >
+                {{ position_label }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="cabinet-layout__preview">
+        <div class="cabinet-layout__stage">
+          <div
+            class="cabinet-layout__cabinets"
+            data-cabinets
+            data-knob-position="{{ section.settings.default_knob_position }}"
+            data-knob-shape="{{ section.settings.default_knob_shape }}"
+          >
+            {% for i in (1..initial_count) %}
+              <div class="cabinet-layout__cabinet">
+                <span class="cabinet-layout__knob" aria-hidden="true"></span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="cabinet-layout__legend" aria-live="polite">
+          <div class="cabinet-layout__legend-item">
+            <span>Count</span>
+            <strong data-value="count">{{ initial_count }}</strong>
+          </div>
+          <div class="cabinet-layout__legend-item">
+            <span>Dimensions</span>
+            <strong><span data-value="width">{{ initial_width }}</span> × <span data-value="height">{{ initial_height }}</span> px</strong>
+          </div>
+          <div class="cabinet-layout__legend-item">
+            <span>Knob</span>
+            <strong><span data-value="knobShape">{{ section.settings.default_knob_shape | replace: '-', ' ' }}</span>, <span data-value="knobSize">{{ section.settings.default_knob_size }}</span> px</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .cabinet-layout {
+    --cabinet-width: 240px;
+    --cabinet-height: 280px;
+    --cabinet-gap: 16px;
+    --cabinet-color: #d9d9d9;
+    --knob-color: #d97706;
+    --knob-size: 14px;
+    --knob-offset: 20px;
+  }
+
+  .cabinet-layout__shell {
+    display: grid;
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+  }
+
+  .cabinet-layout__header {
+    display: grid;
+    gap: 0.35rem;
+    max-width: 40rem;
+  }
+
+  .cabinet-layout__eyebrow {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  .cabinet-layout__title {
+    margin: 0;
+    font-size: clamp(1.6rem, 2.2vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .cabinet-layout__subtitle {
+    margin: 0;
+    color: rgb(from currentColor r g b / 0.82);
+    max-width: 42rem;
+  }
+
+  .cabinet-layout__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .cabinet-layout__content {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .cabinet-layout__controls {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.12));
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 18px;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    box-shadow:
+      0 18px 40px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .cabinet-layout__control {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .cabinet-layout__control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .cabinet-layout__value {
+    font-size: 0.95rem;
+    color: rgb(from currentColor r g b / 0.75);
+  }
+
+  .cabinet-layout__control input[type='range'] {
+    accent-color: currentColor;
+    width: 100%;
+  }
+
+  .cabinet-layout__control--two-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 600px) {
+    .cabinet-layout__control--two-up {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .cabinet-layout__color-control {
+    display: grid;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+
+  .cabinet-layout__color-control input[type='color'] {
+    width: 100%;
+    min-height: 3rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .cabinet-layout__divider {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    margin: 0.25rem 0 0.1rem;
+  }
+
+  .cabinet-layout__segmented {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .cabinet-layout__pill {
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: currentColor;
+    padding: 0.65rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .cabinet-layout__pill.is-active {
+    border-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+    transform: translateY(-2px);
+  }
+
+  .cabinet-layout__pill:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  .cabinet-layout__preview {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .cabinet-layout__stage {
+    position: relative;
+    border-radius: 20px;
+    padding: clamp(1rem, 3vw, 2rem);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.12), transparent 35%),
+      radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.16), transparent 30%),
+      linear-gradient(135deg, rgba(7, 12, 24, 0.9), rgba(12, 31, 42, 0.82));
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 18px 45px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+  }
+
+  .cabinet-layout__cabinets {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--cabinet-width);
+    gap: var(--cabinet-gap);
+    align-items: flex-end;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: clamp(0.6rem, 2vw, 1.25rem);
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.1));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .cabinet-layout__cabinet {
+    position: relative;
+    width: var(--cabinet-width);
+    min-width: var(--cabinet-width);
+    height: var(--cabinet-height);
+    border-radius: 14px;
+    background: var(--cabinet-color);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow:
+      0 18px 35px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+
+  .cabinet-layout__cabinet::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+
+  .cabinet-layout__cabinet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.12));
+    pointer-events: none;
+  }
+
+  .cabinet-layout__knob {
+    position: absolute;
+    width: var(--knob-size);
+    height: var(--knob-size);
+    background: var(--knob-color);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+  }
+
+  .cabinet-layout__knob[data-shape='square'] {
+    border-radius: 8px;
+  }
+
+  .cabinet-layout__knob[data-shape='bar'] {
+    width: calc(var(--knob-size) * 2.2);
+    height: calc(var(--knob-size) * 0.55);
+    border-radius: 999px;
+  }
+
+  .cabinet-layout__cabinets[data-knob-position='bottom-left'] .cabinet-layout__knob {
+    top: auto;
+    bottom: var(--knob-offset);
+    left: var(--knob-offset);
+    transform: translate(0, 0);
+  }
+
+  .cabinet-layout__cabinets[data-knob-position='bottom-right'] .cabinet-layout__knob {
+    top: auto;
+    bottom: var(--knob-offset);
+    left: auto;
+    right: var(--knob-offset);
+    transform: translate(0, 0);
+  }
+
+  .cabinet-layout__cabinets[data-knob-position='middle-left'] .cabinet-layout__knob {
+    top: 50%;
+    left: var(--knob-offset);
+    right: auto;
+    transform: translate(0, -50%);
+  }
+
+  .cabinet-layout__cabinets[data-knob-position='middle-right'] .cabinet-layout__knob {
+    top: 50%;
+    left: auto;
+    right: var(--knob-offset);
+    transform: translate(0, -50%);
+  }
+
+  .cabinet-layout__legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .cabinet-layout__legend-item {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .cabinet-layout__legend-item span {
+    font-size: 0.9rem;
+    color: rgb(from currentColor r g b / 0.75);
+  }
+{% endstylesheet %}
+
+<script type="module">
+  (() => {
+    const section = document.getElementById('CabinetLayout-{{ section.id }}');
+    if (!section) return;
+
+    const cabinets = section.querySelector('[data-cabinets]');
+    if (!cabinets) return;
+
+    const controls = {
+      count: section.querySelector('[data-control="count"]'),
+      width: section.querySelector('[data-control="width"]'),
+      height: section.querySelector('[data-control="height"]'),
+      cabinetColor: section.querySelector('[data-control="cabinetColor"]'),
+      knobColor: section.querySelector('[data-control="knobColor"]'),
+      knobSize: section.querySelector('[data-control="knobSize"]')
+    };
+
+    const pills = {
+      shape: [...section.querySelectorAll('[data-knob-shape]')],
+      position: [...section.querySelectorAll('[data-knob-position]')]
+    };
+
+    const readouts = {
+      count: section.querySelectorAll('[data-value="count"]'),
+      width: section.querySelectorAll('[data-value="width"]'),
+      height: section.querySelectorAll('[data-value="height"]'),
+      knobSize: section.querySelectorAll('[data-value="knobSize"]'),
+      knobShape: section.querySelectorAll('[data-value="knobShape"]')
+    };
+
+    const state = {
+      count: Number(controls.count?.value) || {{ initial_count }},
+      width: Number(controls.width?.value) || {{ initial_width }},
+      height: Number(controls.height?.value) || {{ initial_height }},
+      cabinetColor: controls.cabinetColor?.value || '{{ section.settings.default_cabinet_color }}',
+      knobColor: controls.knobColor?.value || '{{ section.settings.default_knob_color }}',
+      knobSize: Number(controls.knobSize?.value) || {{ section.settings.default_knob_size }},
+      knobShape: cabinets.dataset.knobShape || '{{ section.settings.default_knob_shape }}',
+      knobPosition: cabinets.dataset.knobPosition || '{{ section.settings.default_knob_position }}'
+    };
+
+    const setCSSVariables = () => {
+      section.style.setProperty('--cabinet-width', `${state.width}px`);
+      section.style.setProperty('--cabinet-height', `${state.height}px`);
+      section.style.setProperty('--cabinet-color', state.cabinetColor);
+      section.style.setProperty('--knob-color', state.knobColor);
+      section.style.setProperty('--knob-size', `${state.knobSize}px`);
+    };
+
+    const updateReadouts = () => {
+      readouts.count.forEach((node) => (node.textContent = state.count));
+      readouts.width.forEach((node) => (node.textContent = state.width));
+      readouts.height.forEach((node) => (node.textContent = state.height));
+      readouts.knobSize.forEach((node) => (node.textContent = state.knobSize));
+      readouts.knobShape.forEach((node) => (node.textContent = state.knobShape.replace('-', ' ')));
+    };
+
+    const setActivePills = () => {
+      pills.shape.forEach((pill) => pill.classList.toggle('is-active', pill.dataset.knobShape === state.knobShape));
+      pills.position.forEach((pill) =>
+        pill.classList.toggle('is-active', pill.dataset.knobPosition === state.knobPosition)
+      );
+    };
+
+    const renderCabinets = () => {
+      cabinets.dataset.knobShape = state.knobShape;
+      cabinets.dataset.knobPosition = state.knobPosition;
+
+      const existing = cabinets.children.length;
+      const needed = Math.max(state.count, 0);
+
+      // Add or remove cabinet elements to match the requested count
+      if (existing !== needed) {
+        cabinets.innerHTML = '';
+        for (let i = 0; i < needed; i += 1) {
+          const cabinet = document.createElement('div');
+          cabinet.className = 'cabinet-layout__cabinet';
+
+          const knob = document.createElement('span');
+          knob.className = 'cabinet-layout__knob';
+          knob.setAttribute('aria-hidden', 'true');
+          cabinet.appendChild(knob);
+
+          cabinets.appendChild(cabinet);
+        }
+      }
+
+      // Sync knob styles on every cabinet
+      cabinets.querySelectorAll('.cabinet-layout__knob').forEach((knob) => {
+        knob.dataset.shape = state.knobShape;
+        knob.style.setProperty('--knob-size', `${state.knobSize}px`);
+        knob.style.setProperty('--knob-color', state.knobColor);
+      });
+    };
+
+    const handleSlider = (key) => (event) => {
+      const value = Number(event.target.value);
+      if (Number.isNaN(value)) return;
+      state[key] = value;
+      setCSSVariables();
+      if (key === 'count') renderCabinets();
+      updateReadouts();
+    };
+
+    const handleColor = (key) => (event) => {
+      state[key] = event.target.value;
+      setCSSVariables();
+      renderCabinets();
+    };
+
+    const handlePillClick = (key, value) => {
+      state[key] = value;
+      setActivePills();
+      renderCabinets();
+      updateReadouts();
+    };
+
+    // Wire up events
+    controls.count?.addEventListener('input', handleSlider('count'));
+    controls.width?.addEventListener('input', handleSlider('width'));
+    controls.height?.addEventListener('input', handleSlider('height'));
+    controls.knobSize?.addEventListener('input', handleSlider('knobSize'));
+    controls.cabinetColor?.addEventListener('input', handleColor('cabinetColor'));
+    controls.knobColor?.addEventListener('input', handleColor('knobColor'));
+
+    pills.shape.forEach((pill) => {
+      pill.addEventListener('click', () => handlePillClick('knobShape', pill.dataset.knobShape));
+    });
+
+    pills.position.forEach((pill) => {
+      pill.addEventListener('click', () => handlePillClick('knobPosition', pill.dataset.knobPosition));
+    });
+
+    // Initialize view
+    setCSSVariables();
+    setActivePills();
+    renderCabinets();
+    updateReadouts();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cabinet layout builder",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "Plan the perfect row"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Cabinet layout designer"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Drag the sliders to set cabinet dimensions, choose knob styles, and see the run come together instantly."
+    },
+    {
+      "type": "range",
+      "id": "initial_cabinet_count",
+      "label": "Initial cabinets side by side",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "max_cabinets",
+      "label": "Maximum cabinets for the slider",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "default_cabinet_width",
+      "label": "Default cabinet width (px)",
+      "min": 140,
+      "max": 420,
+      "step": 5,
+      "unit": "px",
+      "default": 240
+    },
+    {
+      "type": "range",
+      "id": "default_cabinet_height",
+      "label": "Default cabinet height (px)",
+      "min": 140,
+      "max": 420,
+      "step": 5,
+      "unit": "px",
+      "default": 280
+    },
+    {
+      "type": "color",
+      "id": "default_cabinet_color",
+      "label": "Default cabinet color",
+      "default": "#e6e0d5"
+    },
+    {
+      "type": "range",
+      "id": "cabinet_gap",
+      "label": "Spacing between cabinets",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "default_knob_color",
+      "label": "Default knob color",
+      "default": "#d97706"
+    },
+    {
+      "type": "range",
+      "id": "default_knob_size",
+      "label": "Default knob size (px)",
+      "min": 8,
+      "max": 38,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "default_knob_shape",
+      "label": "Default knob style",
+      "options": [
+        {
+          "value": "round",
+          "label": "Round"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "bar",
+          "label": "Bar pull"
+        }
+      ],
+      "default": "round"
+    },
+    {
+      "type": "select",
+      "id": "default_knob_position",
+      "label": "Default knob position",
+      "options": [
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        },
+        {
+          "value": "middle-left",
+          "label": "Middle left"
+        },
+        {
+          "value": "middle-right",
+          "label": "Middle right"
+        }
+      ],
+      "default": "bottom-right"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cabinet layout builder",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
