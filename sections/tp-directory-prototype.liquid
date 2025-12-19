@@ -1,0 +1,503 @@
+{% comment %}
+  TP Directory Prototype
+  Prototype UI driven by section blocks (Group + Item)
+  Later swap blocks for a metaobject, keep the markup the same.
+{% endcomment %}
+
+<section class="tp-dir" data-section-id="{{ section.id }}">
+  <div class="tp-dir__header">
+    {% if section.settings.title != blank %}
+      <h1 class="tp-dir__title">{{ section.settings.title }}</h1>
+    {% endif %}
+
+    {% if section.settings.show_search %}
+      <div class="tp-dir__searchWrap">
+        <input
+          class="tp-dir__search"
+          type="search"
+          placeholder="{{ section.settings.search_placeholder | escape }}"
+          aria-label="Search">
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="tp-dir__body">
+    <div
+      class="tp-dir__groups"
+      role="tablist"
+      aria-label="Directory groups">
+      {% for block in section.blocks %}
+        {% if block.type == 'group' %}
+          {% assign group_key = block.settings.group_key | strip %}
+          <button
+            class="tp-dir__groupRow"
+            type="button"
+            role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-group="{{ group_key | escape }}"
+            {{ block.shopify_attributes }}>
+            <span class="tp-dir__groupTitle">
+              {% if block.settings.icon != blank %}
+                <span class="tp-dir__groupIcon">
+                  {{ block.settings.icon | image_url: width: 48 | image_tag: loading: 'lazy', alt: '' }}
+                </span>
+              {% elsif block.settings.icon_text != blank %}
+                <span class="tp-dir__groupIconText" aria-hidden="true">{{ block.settings.icon_text }}</span>
+              {% endif %}
+              <span class="tp-dir__groupText">{{ block.settings.title }}</span>
+            </span>
+
+            <span class="tp-dir__chev" aria-hidden="true">→</span>
+          </button>
+
+          <div
+            class="tp-dir__items"
+            role="tabpanel"
+            data-panel="{{ group_key | escape }}"
+            {% if forloop.first %}
+            style="display:block"
+            {% else %}
+            style="display:none"
+            {% endif %}>
+            {% if section.settings.show_filters %}
+              <div class="tp-dir__filters" data-filters="{{ group_key | escape }}"></div>
+            {% endif %}
+
+            <div class="tp-dir__itemsList" data-items-list="{{ group_key | escape }}">
+              {% assign found_any = false %}
+
+              {% for item in section.blocks %}
+                {% if item.type == 'item' %}
+                  {% assign item_group = item.settings.group_key | strip %}
+                  {% if item_group == group_key %}
+                    {% assign found_any = true %}
+                    {% assign badges_raw = item.settings.badges | strip %}
+                    {% assign badges = badges_raw | split: ',' %}
+
+                    <a
+                      class="tp-dir__itemRow"
+                      href="{{ item.settings.url }}"
+                      {% if item.settings.open_new_tab %}
+                      target="_blank"
+                      rel="noopener"
+                      {% endif %}
+                      data-title="{{ item.settings.title | downcase | escape }}"
+                      data-badges="{{ badges_raw | downcase | escape }}"
+                      {{ item.shopify_attributes }}>
+                      <span class="tp-dir__itemTitle">{{ item.settings.title }}</span>
+
+                      <span class="tp-dir__itemBadges">
+                        {% for b in badges %}
+                          {% assign badge = b | strip %}
+                          {% if badge != blank %}
+                            <span class="tp-dir__badge" data-badge="{{ badge | downcase | escape }}">{{ badge }}</span>
+                          {% endif %}
+                        {% endfor %}
+                      </span>
+
+                      <span class="tp-dir__chev" aria-hidden="true">→</span>
+                    </a>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% unless found_any %}
+                <div class="tp-dir__empty">No items yet.</div>
+              {% endunless %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tp-dir {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 18px 30px;
+  }
+
+  .tp-dir__header {
+    position: relative;
+    padding: 6px 0 14px;
+  }
+
+  .tp-dir__title {
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-align: center;
+  }
+
+  .tp-dir__searchWrap {
+    margin: 14px auto 0;
+    max-width: 560px;
+  }
+
+  .tp-dir__search {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    font-size: 16px;
+    outline: none;
+  }
+
+  .tp-dir__body {
+    margin-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.18);
+  }
+
+  .tp-dir__groupRow {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+    padding: 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .tp-dir__groupTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .tp-dir__groupText {
+    font-size: 34px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tp-dir__groupIcon img {
+    width: 28px;
+    height: 28px;
+    display: block;
+  }
+
+  .tp-dir__groupIconText {
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .tp-dir__items {
+    padding: 10px 0 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  }
+
+  .tp-dir__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 6px 12px 10px;
+  }
+
+  .tp-dir__filterPill {
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.03);
+    user-select: none;
+  }
+
+  .tp-dir__filterPill[aria-pressed="true"] {
+    background: rgba(0, 0, 0, 0.10);
+  }
+
+  .tp-dir__itemRow {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .tp-dir__itemRow:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  .tp-dir__itemTitle {
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tp-dir__itemBadges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .tp-dir__badge {
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 13px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+  }
+
+  .tp-dir__chev {
+    opacity: 0.55;
+    font-size: 18px;
+  }
+
+  .tp-dir__empty {
+    padding: 10px 12px 2px;
+    opacity: 0.65;
+    font-size: 14px;
+  }
+
+  @media (max-width: 720px) {
+    .tp-dir__title {
+      font-size: 34px;
+    }
+    .tp-dir__groupText {
+      font-size: 26px;
+    }
+    .tp-dir__itemTitle {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const root = document.querySelector('.tp-dir[data-section-id="{{ section.id }}"]');
+    if (!root) return;
+
+    const groupButtons = Array.from(root.querySelectorAll('.tp-dir__groupRow'));
+    const panels = Array.from(root.querySelectorAll('.tp-dir__items'));
+    const searchInput = root.querySelector('.tp-dir__search');
+
+    function setActiveGroup(groupKey) {
+      groupButtons.forEach(btn => {
+        const isActive = btn.dataset.group === groupKey;
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      panels.forEach(panel => {
+        panel.style.display = panel.dataset.panel === groupKey ? 'block' : 'none';
+      });
+
+      buildFilters(groupKey);
+      applyFiltersAndSearch(groupKey);
+    }
+
+    function getActiveGroup() {
+      const active = groupButtons.find(b => b.getAttribute('aria-selected') === 'true');
+      return active ? active.dataset.group : (groupButtons[0] ? groupButtons[0].dataset.group : null);
+    }
+
+    function buildFilters(groupKey) {
+      const filterWrap = root.querySelector('[data-filters="' + groupKey + '"]');
+      if (!filterWrap) return;
+
+      filterWrap.innerHTML = '';
+      const list = root.querySelector('[data-items-list="' + groupKey + '"]');
+      if (!list) return;
+
+      const badgeSet = new Set();
+      list.querySelectorAll('.tp-dir__badge').forEach(b => badgeSet.add(b.textContent.trim()));
+      const badges = Array.from(badgeSet).filter(Boolean).sort((a,b) => a.localeCompare(b));
+
+      if (!badges.length) return;
+
+      const all = document.createElement('button');
+      all.type = 'button';
+      all.className = 'tp-dir__filterPill';
+      all.textContent = 'All';
+      all.setAttribute('aria-pressed', 'true');
+      all.dataset.filter = '';
+      filterWrap.appendChild(all);
+
+      badges.forEach(name => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'tp-dir__filterPill';
+        pill.textContent = name;
+        pill.setAttribute('aria-pressed', 'false');
+        pill.dataset.filter = name.toLowerCase();
+        filterWrap.appendChild(pill);
+      });
+
+      filterWrap.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tp-dir__filterPill');
+        if (!btn) return;
+
+        filterWrap.querySelectorAll('.tp-dir__filterPill').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        applyFiltersAndSearch(groupKey);
+      }, { once: true });
+    }
+
+    function applyFiltersAndSearch(groupKey) {
+      const list = root.querySelector('[data-items-list="' + groupKey + '"]');
+      if (!list) return;
+
+      const filterWrap = root.querySelector('[data-filters="' + groupKey + '"]');
+      const activeFilterBtn = filterWrap ? filterWrap.querySelector('.tp-dir__filterPill[aria-pressed="true"]') : null;
+      const filterValue = activeFilterBtn ? (activeFilterBtn.dataset.filter || '') : '';
+
+      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+
+      list.querySelectorAll('.tp-dir__itemRow').forEach(row => {
+        const title = row.getAttribute('data-title') || '';
+        const badges = row.getAttribute('data-badges') || '';
+
+        const matchesSearch = !q || title.includes(q) || badges.includes(q);
+        const matchesFilter = !filterValue || badges.includes(filterValue);
+
+        row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+      });
+    }
+
+    groupButtons.forEach(btn => {
+      btn.addEventListener('click', () => setActiveGroup(btn.dataset.group));
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const groupKey = getActiveGroup();
+        if (!groupKey) return;
+        applyFiltersAndSearch(groupKey);
+      });
+    }
+
+    const initial = getActiveGroup();
+    if (initial) {
+      buildFilters(initial);
+      applyFiltersAndSearch(initial);
+    }
+  })();
+</script>
+
+{% schema %}
+  {
+    "name": "TP Directory Prototype",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "The Mother Of All Lists"
+      }, {
+        "type": "checkbox",
+        "id": "show_search",
+        "label": "Show search",
+        "default": true
+      }, {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Search placeholder",
+        "default": "Search"
+      }, {
+        "type": "checkbox",
+        "id": "show_filters",
+        "label": "Show badge filters",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "group",
+        "name": "Group",
+        "settings": [
+          {
+            "type": "text",
+            "id": "group_key",
+            "label": "Group key (unique)",
+            "default": "essays"
+          }, {
+            "type": "text",
+            "id": "title",
+            "label": "Group title",
+            "default": "Essays"
+          }, {
+            "type": "image_picker",
+            "id": "icon",
+            "label": "Icon image (optional)"
+          }, {
+            "type": "text",
+            "id": "icon_text",
+            "label": "Icon text (optional)",
+            "default": "✦"
+          }
+        ]
+      }, {
+        "type": "item",
+        "name": "Item",
+        "settings": [
+          {
+            "type": "text",
+            "id": "group_key",
+            "label": "Group key (must match a group)",
+            "default": "essays"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Item title",
+            "default": "Potts Refillable Candles"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          },
+          {
+            "type": "text",
+            "id": "badges",
+            "label": "Badges (comma separated)",
+            "default": "Essays, Resources"
+          }, {
+            "type": "checkbox",
+            "id": "open_new_tab",
+            "label": "Open in new tab",
+            "default": false
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "TP Directory Prototype",
+        "blocks": [
+          {
+            "type": "group"
+          },
+          {
+            "type": "item"
+          },
+          {
+            "type": "item"
+          },
+          {
+            "type": "group"
+          }, {
+            "type": "item"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
