@@ -497,9 +497,9 @@
           "type": "item",
           "settings": {
             "group_key": "essays",
-            "title": "Potts Refillable Candles",
+            "title": "Essay One",
             "url": "",
-            "badges": "Essays, Resources",
+            "badges": "Essays",
             "open_new_tab": false
           }
         },
