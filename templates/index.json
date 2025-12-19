@@ -175,6 +175,29 @@
         "padding-block-end": 0
       }
     },
+    "cabinet_layout_builder_mwqNpc": {
+      "type": "cabinet-layout-builder",
+      "name": "Cabinet layout builder",
+      "settings": {
+        "eyebrow": "Plan the perfect row",
+        "heading": "Cabinet layout designer",
+        "subheading": "Drag the sliders to set cabinet dimensions, choose knob styles, and see the run come together instantly.",
+        "initial_cabinet_count": 3,
+        "max_cabinets": 6,
+        "default_cabinet_width": 240,
+        "default_cabinet_height": 280,
+        "default_cabinet_color": "#e6e0d5",
+        "cabinet_gap": 16,
+        "default_knob_color": "#d97706",
+        "default_knob_size": 16,
+        "default_knob_shape": "round",
+        "default_knob_position": "bottom-right",
+        "color_scheme": "",
+        "section_width": "page-width",
+        "padding-block-start": 28,
+        "padding-block-end": 28
+      }
+    },
     "product_list_qU3bEB": {
       "type": "product-list",
       "blocks": {
@@ -428,32 +451,8 @@
         "padding-block-end": 96
       }
     },
-    "section_NRwtGM": {
+    "section_aeDaDF": {
       "type": "section",
-      "blocks": {
-        "ai_gen_block_aa7ee69_pxdRMY": {
-          "type": "ai_gen_block_aa7ee69",
-          "settings": {
-            "blog": "partnerships",
-            "tag": "",
-            "max_articles": 6,
-            "background_color": "#f9f9f9",
-            "border_radius": 12,
-            "image_border_radius": 12,
-            "image_size_min": 150,
-            "image_size_max": 250,
-            "show_title": true,
-            "title_size": 14,
-            "title_color": "#ffffff",
-            "title_background_color": "#000000",
-            "title_opacity": 80
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "ai_gen_block_aa7ee69_pxdRMY"
-      ],
       "name": "t:names.custom_section",
       "settings": {
         "content_direction": "column",
@@ -487,7 +486,8 @@
   "order": [
     "hero_jVaWmY",
     "1764817713c1521a32",
+    "cabinet_layout_builder_mwqNpc",
     "product_list_qU3bEB",
-    "section_NRwtGM"
+    "section_aeDaDF"
   ]
 }
