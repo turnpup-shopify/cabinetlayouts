@@ -516,8 +516,8 @@
         "group_f3fyXw": {
           "type": "group",
           "settings": {
-            "group_key": "essays",
-            "title": "Essays",
+            "group_key": "resources",
+            "title": "Resources",
             "icon_text": "✦"
           }
         },
