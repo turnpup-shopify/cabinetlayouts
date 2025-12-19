@@ -530,6 +530,16 @@
             "badges": "Essays, Resources",
             "open_new_tab": false
           }
+        },
+        "item_gCiiyG": {
+          "type": "item",
+          "settings": {
+            "group_key": "resources",
+            "title": "resource example",
+            "url": "",
+            "badges": "Resources",
+            "open_new_tab": false
+          }
         }
       },
       "block_order": [
@@ -537,7 +547,8 @@
         "item_Ccbgwx",
         "item_MrMBcP",
         "group_f3fyXw",
-        "item_4JcAUh"
+        "item_4JcAUh",
+        "item_gCiiyG"
       ],
       "name": "TP Directory Prototype",
       "settings": {
