@@ -351,15 +351,15 @@
       });
     }
 
-    function applyFiltersAndSearch(groupKey) {
+    function filterGroup(groupKey, q) {
       const list = root.querySelector('[data-items-list="' + groupKey + '"]');
-      if (!list) return;
+      if (!list) return false;
 
       const filterWrap = root.querySelector('[data-filters="' + groupKey + '"]');
       const activeFilterBtn = filterWrap ? filterWrap.querySelector('.tp-dir__filterPill[aria-pressed="true"]') : null;
       const filterValue = activeFilterBtn ? (activeFilterBtn.dataset.filter || '') : '';
 
-      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      let hasVisible = false;
 
       list.querySelectorAll('.tp-dir__itemRow').forEach(row => {
         const title = row.getAttribute('data-title') || '';
@@ -368,8 +368,49 @@
         const matchesSearch = !q || title.includes(q) || badges.includes(q);
         const matchesFilter = !filterValue || badges.includes(filterValue);
 
-        row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+        const show = matchesSearch && matchesFilter;
+        row.style.display = show ? '' : 'none';
+        if (show) hasVisible = true;
       });
+
+      return hasVisible;
+    }
+
+    function applyFiltersAndSearch(groupKey) {
+      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      const matchCache = {};
+
+      const ensureMatches = (key) => {
+        if (matchCache.hasOwnProperty(key)) return matchCache[key];
+        matchCache[key] = filterGroup(key, q);
+        return matchCache[key];
+      };
+
+      if (q) {
+        let firstMatch = null;
+
+        groupButtons.forEach(btn => {
+          const key = btn.dataset.group;
+          const hasMatches = ensureMatches(key);
+          if (hasMatches && firstMatch === null) firstMatch = key;
+          btn.setAttribute('aria-selected', hasMatches && key === firstMatch ? 'true' : 'false');
+        });
+
+        panels.forEach(panel => {
+          const key = panel.dataset.panel;
+          const hasMatches = ensureMatches(key);
+          panel.style.display = hasMatches ? 'block' : 'none';
+        });
+      } else {
+        const activeKey = groupKey || getActiveGroup();
+        groupButtons.forEach(btn => {
+          btn.setAttribute('aria-selected', btn.dataset.group === activeKey ? 'true' : 'false');
+        });
+        panels.forEach(panel => {
+          panel.style.display = panel.dataset.panel === activeKey ? 'block' : 'none';
+        });
+        filterGroup(activeKey, q);
+      }
     }
 
     groupButtons.forEach(btn => {
