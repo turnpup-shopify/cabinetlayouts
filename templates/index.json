@@ -16,7 +16,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<h2>Kitchen Cabinet Ideas</h2>",
+            "text": "<p>Receipts for the tools behind creative work.</p>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -42,7 +42,7 @@
           "type": "text",
           "name": "t:names.text",
           "settings": {
-            "text": "<p>Level up your crafting skills with step-by-step guides from top designers. Browse our curated easy to follow guides to designing, decorating, and remodeling your kitchen cabinets.</p>",
+            "text": "<p>A maintained record of creative tools and resources for designers and creative in all fields. We go behind the scenes and curate the best and the most fringe tools so you can get inspired and stay up-to-date on trends from the community.</p>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
