@@ -348,7 +348,7 @@
         filterWrap.querySelectorAll('.tp-dir__filterPill').forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
         applyFiltersAndSearch(groupKey);
-      }, { once: true });
+      });
     }
 
     function applyFiltersAndSearch(groupKey) {
