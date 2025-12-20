@@ -481,6 +481,82 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "tp_directory_prototype_YPi8rE": {
+      "type": "tp-directory-prototype",
+      "blocks": {
+        "group_UVTpjg": {
+          "type": "group",
+          "settings": {
+            "group_key": "essays",
+            "title": "Essays",
+            "icon_text": "✦"
+          }
+        },
+        "item_Ccbgwx": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Essay One",
+            "url": "",
+            "badges": "Essays",
+            "open_new_tab": false
+          }
+        },
+        "item_MrMBcP": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Potts Refillable Candles",
+            "url": "",
+            "badges": "Essays, Resources",
+            "open_new_tab": false
+          }
+        },
+        "group_f3fyXw": {
+          "type": "group",
+          "settings": {
+            "group_key": "resources",
+            "title": "Resources",
+            "icon_text": "✦"
+          }
+        },
+        "item_4JcAUh": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Potts Refillable Candles",
+            "url": "",
+            "badges": "Essays, Resources",
+            "open_new_tab": false
+          }
+        },
+        "item_gCiiyG": {
+          "type": "item",
+          "settings": {
+            "group_key": "resources",
+            "title": "resource example",
+            "url": "",
+            "badges": "Resources",
+            "open_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "group_UVTpjg",
+        "item_Ccbgwx",
+        "item_MrMBcP",
+        "group_f3fyXw",
+        "item_4JcAUh",
+        "item_gCiiyG"
+      ],
+      "name": "TP Directory Prototype",
+      "settings": {
+        "title": "The Mother Of All Lists",
+        "show_search": true,
+        "search_placeholder": "Search",
+        "show_filters": true
+      }
     }
   },
   "order": [
@@ -488,6 +564,7 @@
     "1764817713c1521a32",
     "cabinet_layout_builder_mwqNpc",
     "product_list_qU3bEB",
-    "section_aeDaDF"
+    "section_aeDaDF",
+    "tp_directory_prototype_YPi8rE"
   ]
 }
