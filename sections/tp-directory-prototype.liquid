@@ -28,7 +28,8 @@
       aria-label="Directory groups">
       {% for block in section.blocks %}
         {% if block.type == 'group' %}
-          {% assign group_key = block.settings.group_key | strip %}
+          {% assign group_key_raw = block.settings.group_key | strip %}
+          {% assign group_key = group_key_raw | handle | default: block.id %}
           <button
             class="tp-dir__groupRow"
             type="button"
@@ -68,7 +69,7 @@
 
               {% for item in section.blocks %}
                 {% if item.type == 'item' %}
-                  {% assign item_group = item.settings.group_key | strip %}
+                  {% assign item_group = item.settings.group_key | strip | handle | default: item.id %}
                   {% if item_group == group_key %}
                     {% assign found_any = true %}
                     {% assign badges_raw = item.settings.badges | strip %}
