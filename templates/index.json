@@ -488,28 +488,28 @@
         "group_UVTpjg": {
           "type": "group",
           "settings": {
-            "group_key": "essays",
-            "title": "Essays",
+            "group_key": "brand",
+            "title": "Brand",
             "icon_text": "✦"
           }
         },
         "item_Ccbgwx": {
           "type": "item",
           "settings": {
-            "group_key": "essays",
-            "title": "Essay One",
+            "group_key": "brand",
+            "title": "Logo Inspiration",
             "url": "",
-            "badges": "Essays",
+            "badges": "Movies",
             "open_new_tab": false
           }
         },
         "item_MrMBcP": {
           "type": "item",
           "settings": {
-            "group_key": "essays",
-            "title": "Potts Refillable Candles",
+            "group_key": "brand",
+            "title": "Typography Inspiration",
             "url": "",
-            "badges": "Essays, Resources",
+            "badges": "Animation",
             "open_new_tab": false
           }
         },
@@ -524,10 +524,10 @@
         "item_4JcAUh": {
           "type": "item",
           "settings": {
-            "group_key": "essays",
-            "title": "Potts Refillable Candles",
+            "group_key": "resources",
+            "title": "Grid Inspiration",
             "url": "",
-            "badges": "Essays, Resources",
+            "badges": "Grid",
             "open_new_tab": false
           }
         },
@@ -535,7 +535,7 @@
           "type": "item",
           "settings": {
             "group_key": "resources",
-            "title": "resource example",
+            "title": "Carousel Inspiration",
             "url": "",
             "badges": "Resources",
             "open_new_tab": false
