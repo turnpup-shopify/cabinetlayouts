@@ -4,7 +4,11 @@
   Later swap blocks for a metaobject, keep the markup the same.
 {% endcomment %}
 
-<section class="tp-dir" data-section-id="{{ section.id }}">
+<section
+  class="tp-dir"
+  data-section-id="{{ section.id }}"
+  data-use-csv="{{ section.settings.use_csv | default: false }}"
+  data-csv-url="{{ section.settings.csv_url | escape }}">
   <div class="tp-dir__header">
     {% if section.settings.title != blank %}
       <h1 class="tp-dir__title">{{ section.settings.title }}</h1>
@@ -286,9 +290,17 @@
     const root = document.querySelector('.tp-dir[data-section-id="{{ section.id }}"]');
     if (!root) return;
 
-    const groupButtons = Array.from(root.querySelectorAll('.tp-dir__groupRow'));
-    const panels = Array.from(root.querySelectorAll('.tp-dir__items'));
     const searchInput = root.querySelector('.tp-dir__search');
+    let groupButtons = Array.from(root.querySelectorAll('.tp-dir__groupRow'));
+    let panels = Array.from(root.querySelectorAll('.tp-dir__items'));
+
+    const useCsv = root.dataset.useCsv === 'true';
+    const csvUrl = root.dataset.csvUrl;
+
+    function refreshRefs() {
+      groupButtons = Array.from(root.querySelectorAll('.tp-dir__groupRow'));
+      panels = Array.from(root.querySelectorAll('.tp-dir__items'));
+    }
 
     function setActiveGroup(groupKey) {
       groupButtons.forEach(btn => {
@@ -413,22 +425,203 @@
       }
     }
 
-    groupButtons.forEach(btn => {
-      btn.addEventListener('click', () => setActiveGroup(btn.dataset.group));
-    });
-
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        const groupKey = getActiveGroup();
-        if (!groupKey) return;
-        applyFiltersAndSearch(groupKey);
+    function wireEvents() {
+      groupButtons.forEach(btn => {
+        btn.addEventListener('click', () => setActiveGroup(btn.dataset.group));
       });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          const groupKey = getActiveGroup();
+          if (!groupKey) return;
+          applyFiltersAndSearch(groupKey);
+        });
+      }
     }
+
+    function handleize(str) {
+      return (str || '').toString().trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+
+    function hydrateFromCsv(url) {
+      const groupsWrap = root.querySelector('.tp-dir__groups');
+      if (!groupsWrap) return Promise.resolve();
+
+      return fetch(url)
+        .then(res => res.text())
+        .then(text => parseCsv(text))
+        .then(rows => buildFromRows(rows, groupsWrap));
+    }
+
+    function parseCsv(text) {
+      // Lightweight CSV parser with quoted field support.
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"') {
+          if (inQuotes && text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          row.push(field);
+          field = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+          row.push(field);
+          field = '';
+          if (row.some(v => v !== '')) rows.push(row);
+          row = [];
+          if (ch === '\r' && text[i + 1] === '\n') i++; // skip \r\n
+        } else {
+          field += ch;
+        }
+      }
+      row.push(field);
+      if (row.some(v => v !== '')) rows.push(row);
+      return rows;
+    }
+
+    function buildFromRows(rows, groupsWrap) {
+      if (!rows.length) return;
+      const headers = rows[0].map(h => (h || '').trim().toLowerCase());
+      const data = rows.slice(1).filter(r => r.some(v => (v || '').trim() !== ''));
+
+      const idx = (name) => headers.indexOf(name);
+      const gkIdx = idx('group_key');
+      const titleIdx = idx('title');
+      const urlIdx = idx('url');
+      const badgesIdx = idx('badges');
+      const openIdx = idx('open_new_tab');
+      const groupTitleIdx = idx('group_title');
+      const iconTextIdx = idx('icon_text');
+
+      const groups = new Map();
+
+      data.forEach(row => {
+        const rawKey = (row[gkIdx] || '').trim();
+        if (!rawKey) return;
+        const key = handleize(rawKey);
+        const gTitle = (row[groupTitleIdx] || rawKey).trim();
+        const iconText = (row[iconTextIdx] || '').trim();
+
+        if (!groups.has(key)) {
+          groups.set(key, { key, title: gTitle, iconText, items: [] });
+        }
+
+        const title = (row[titleIdx] || '').trim();
+        const url = (row[urlIdx] || '').trim();
+        const badges = (row[badgesIdx] || '').trim();
+        const openNew = ((row[openIdx] || '').trim().toLowerCase() === 'true');
+
+        if (title) {
+          groups.get(key).items.push({ title, url, badges, openNew });
+        }
+      });
+
+      if (!groups.size) return;
+
+      groupsWrap.innerHTML = '';
+
+      groups.forEach((group, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'tp-dir__groupRow';
+        button.setAttribute('role', 'tab');
+        button.dataset.group = group.key;
+        button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+        button.innerHTML = `
+          <span class="tp-dir__groupTitle">
+            ${group.iconText ? `<span class="tp-dir__groupIconText" aria-hidden="true">${group.iconText}</span>` : ''}
+            <span class="tp-dir__groupText">${group.title || group.key}</span>
+          </span>
+          <span class="tp-dir__chev" aria-hidden="true">→</span>
+        `;
+
+        const panel = document.createElement('div');
+        panel.className = 'tp-dir__items';
+        panel.setAttribute('role', 'tabpanel');
+        panel.dataset.panel = group.key;
+        panel.style.display = index === 0 ? 'block' : 'none';
+
+        const filters = document.createElement('div');
+        filters.className = 'tp-dir__filters';
+        filters.dataset.filters = group.key;
+        {% if section.settings.show_filters %}
+        {% else %}
+        filters.style.display = 'none';
+        {% endif %}
+
+        const list = document.createElement('div');
+        list.className = 'tp-dir__itemsList';
+        list.dataset.itemsList = group.key;
+
+        if (!group.items.length) {
+          const empty = document.createElement('div');
+          empty.className = 'tp-dir__empty';
+          empty.textContent = 'No items yet.';
+          list.appendChild(empty);
+        } else {
+          group.items.forEach(item => {
+            const badgesRaw = item.badges || '';
+            const row = document.createElement('a');
+            row.className = 'tp-dir__itemRow';
+            row.href = item.url || '#';
+            if (item.openNew) {
+              row.target = '_blank';
+              row.rel = 'noopener';
+            }
+            row.dataset.title = (item.title || '').toLowerCase();
+            row.dataset.badges = badgesRaw.toLowerCase();
+            row.innerHTML = `
+              <span class="tp-dir__itemTitle">${item.title}</span>
+              <span class="tp-dir__itemBadges">
+                ${badgesRaw.split(',').map(b => b.trim()).filter(Boolean).map(b => `<span class="tp-dir__badge" data-badge="${b.toLowerCase()}">${b}</span>`).join('')}
+              </span>
+              <span class="tp-dir__chev" aria-hidden="true">→</span>
+            `;
+            list.appendChild(row);
+          });
+        }
+
+        panel.appendChild(filters);
+        panel.appendChild(list);
+
+        groupsWrap.appendChild(button);
+        groupsWrap.appendChild(panel);
+      });
+
+      refreshRefs();
+      wireEvents();
+    }
+
+    wireEvents();
 
     const initial = getActiveGroup();
     if (initial) {
       buildFilters(initial);
       applyFiltersAndSearch(initial);
+    }
+
+    if (useCsv && csvUrl) {
+      hydrateFromCsv(csvUrl)
+        .then(() => {
+          const first = getActiveGroup();
+          if (first) {
+            buildFilters(first);
+            applyFiltersAndSearch(first);
+          }
+        })
+        .catch(() => console.warn('TP Directory: failed to load CSV'));
     }
   })();
 </script>
@@ -442,21 +635,35 @@
         "id": "title",
         "label": "Title",
         "default": "The Mother Of All Lists"
-      }, {
+      },
+      {
         "type": "checkbox",
         "id": "show_search",
         "label": "Show search",
         "default": true
-      }, {
+      },
+      {
         "type": "text",
         "id": "search_placeholder",
         "label": "Search placeholder",
         "default": "Search"
-      }, {
+      },
+      {
         "type": "checkbox",
         "id": "show_filters",
         "label": "Show badge filters",
         "default": true
+      }, {
+        "type": "checkbox",
+        "id": "use_csv",
+        "label": "Load items from Google Sheet CSV",
+        "default": false
+      }, {
+        "type": "text",
+        "id": "csv_url",
+        "label": "Public CSV URL (Google Sheet)",
+        "info": "Publish your Google Sheet to the web as CSV and paste the link here. When enabled, blocks are ignored.",
+        "default": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYsgxyxsdEiWFKiaFSKIxWuYU6X4XWuJLsAnhGXUZGG8bYVMsjZXlDJSBZMQp_MrpIx5MbtWiSqrue/pub?output=csv"
       }
     ],
     "blocks": [
