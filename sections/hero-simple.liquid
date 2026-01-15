@@ -26,6 +26,10 @@
   position: relative;
   overflow: hidden;
 ">
+  {% if section.settings.background_video %}
+    {{ section.settings.background_video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false, class: 'slow-down-video' }}
+  {% endif %}
+
   <div class="slow-down-content" style="
     text-align: {{ section.settings.text_alignment }};
     max-width: {{ section.settings.content_max_width }}px;
@@ -83,6 +87,21 @@
 <style>
   .slow-down-section {
     transition: all 0.3s ease;
+  }
+
+  .slow-down-section .slow-down-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .slow-down-content {
+    position: relative;
+    z-index: 1;
   }
 
   @media screen and (max-width: 768px) {
@@ -329,6 +348,12 @@
       "id": "background_image",
       "label": "Background Image",
       "info": "Recommended: High-resolution image (1920x1080 or larger)"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background Video",
+      "info": "Optional. When set, video overlays the background image."
     },
     {
       "type": "range",
@@ -714,7 +739,7 @@
   ],
   "presets": [
     {
-      "name": "Hero - Slow Down"
+      "name": "Slow Down Section"
     }
   ]
 }
