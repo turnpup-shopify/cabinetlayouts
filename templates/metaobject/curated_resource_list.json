@@ -34,36 +34,10 @@
             "gap": 24
           },
           "blocks": {
-            "text_8TwVCE": {
-              "type": "text",
-              "name": "t:names.caption",
-              "settings": {
-                "text": "<p>Bestseller</p>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h6",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
             "group_iMhkig": {
               "type": "group",
               "settings": {
-                "link": "{{ closest.metaobject.curated_resource_list.system.url }}",
+                "link": "{{ metaobjects.curated_resource_list[\"visual-discovery-library\"].system.url }}",
                 "open_in_new_tab": false,
                 "content_direction": "column",
                 "vertical_on_mobile": true,
@@ -171,7 +145,6 @@
             }
           },
           "block_order": [
-            "text_8TwVCE",
             "group_iMhkig",
             "button_hiXdzK"
           ]
