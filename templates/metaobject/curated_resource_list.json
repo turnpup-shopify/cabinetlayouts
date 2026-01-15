@@ -158,10 +158,10 @@
             "button_hiXdzK": {
               "type": "button",
               "settings": {
-                "label": "Shop now",
-                "link": "shopify://collections/all",
-                "open_in_new_tab": false,
-                "style_class": "link",
+                "label": "GO TO SITE",
+                "link": "{{ closest.metaobject.curated_resource_list.system.url }}",
+                "open_in_new_tab": true,
+                "style_class": "button",
                 "width": "fit-content",
                 "custom_width": 100,
                 "width_mobile": "fit-content",
