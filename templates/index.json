@@ -9,6 +9,62 @@
  */
 {
   "sections": {
+    "hero_simple_cFHQJM": {
+      "type": "hero-simple",
+      "name": "Hero - Slow Down",
+      "settings": {
+        "margin_top_desktop": 0,
+        "margin_right_desktop": 0,
+        "margin_bottom_desktop": 0,
+        "margin_left_desktop": 0,
+        "margin_top_mobile": 0,
+        "margin_right_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "margin_left_mobile": 0,
+        "padding_top_desktop": 100,
+        "padding_right_desktop": 40,
+        "padding_bottom_desktop": 100,
+        "padding_left_desktop": 40,
+        "padding_top_mobile": 80,
+        "padding_right_mobile": 20,
+        "padding_bottom_mobile": 80,
+        "padding_left_mobile": 20,
+        "background_color": "#000000",
+        "section_min_height_desktop": 800,
+        "section_min_height_mobile": 600,
+        "content_max_width": 800,
+        "text_alignment": "center",
+        "show_asterisk": true,
+        "asterisk_text": "*",
+        "asterisk_font_family": "Georgia, serif",
+        "asterisk_font_size_desktop": 48,
+        "asterisk_font_size_mobile": 32,
+        "asterisk_color": "#f5f5dc",
+        "asterisk_font_weight": "400",
+        "asterisk_spacing_desktop": 10,
+        "asterisk_spacing_mobile": 5,
+        "main_text": "slow down,",
+        "main_font_family": "Georgia, serif",
+        "main_font_size_desktop": 80,
+        "main_font_size_mobile": 48,
+        "main_color": "#f5f5dc",
+        "main_font_weight": "400",
+        "main_spacing_desktop": 30,
+        "main_spacing_mobile": 20,
+        "show_secondary_text": true,
+        "secondary_text": "you're doing fine!",
+        "secondary_font_family": "Arial, sans-serif",
+        "secondary_font_size_desktop": 20,
+        "secondary_font_size_mobile": 16,
+        "secondary_color": "#f5f5dc",
+        "secondary_font_weight": "400",
+        "secondary_border_color": "#f5f5dc",
+        "secondary_border_width": 2,
+        "secondary_border_radius": 50,
+        "secondary_padding_vertical": 12,
+        "secondary_padding_horizontal": 40
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -147,6 +203,7 @@
       "block_order": [
         "ai_gen_block_3004897_jefaae"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -173,6 +230,73 @@
         "gradient_direction": "to top",
         "padding-block-start": 0,
         "padding-block-end": 0
+      }
+    },
+    "tp_directory_prototype_mgwRkU": {
+      "type": "tp-directory-prototype",
+      "blocks": {
+        "group_DD3rFp": {
+          "type": "group",
+          "settings": {
+            "group_key": "essays",
+            "title": "Essays",
+            "icon_text": "✦"
+          }
+        },
+        "item_bmQXjf": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Potts Refillable Candles",
+            "url": "",
+            "badges": "Essays, Resources",
+            "open_new_tab": false
+          }
+        },
+        "item_mR4wJj": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Potts Refillable Candles",
+            "url": "",
+            "badges": "Essays, Resources",
+            "open_new_tab": false
+          }
+        },
+        "group_VHgH3m": {
+          "type": "group",
+          "settings": {
+            "group_key": "essays",
+            "title": "Essays",
+            "icon_text": "✦"
+          }
+        },
+        "item_FbPTrz": {
+          "type": "item",
+          "settings": {
+            "group_key": "essays",
+            "title": "Potts Refillable Candles",
+            "url": "",
+            "badges": "Essays, Resources",
+            "open_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "group_DD3rFp",
+        "item_bmQXjf",
+        "item_mR4wJj",
+        "group_VHgH3m",
+        "item_FbPTrz"
+      ],
+      "name": "TP Directory Prototype",
+      "settings": {
+        "title": "The Mother Of All Lists",
+        "show_search": true,
+        "search_placeholder": "Search",
+        "show_filters": true,
+        "use_csv": false,
+        "csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYsgxyxsdEiWFKiaFSKIxWuYU6X4XWuJLsAnhGXUZGG8bYVMsjZXlDJSBZMQp_MrpIx5MbtWiSqrue/pub?output=csv"
       }
     },
     "cabinet_layout_builder_mwqNpc": {
@@ -562,8 +686,10 @@
     }
   },
   "order": [
+    "hero_simple_cFHQJM",
     "hero_jVaWmY",
     "1764817713c1521a32",
+    "tp_directory_prototype_mgwRkU",
     "cabinet_layout_builder_mwqNpc",
     "product_list_qU3bEB",
     "section_aeDaDF",
