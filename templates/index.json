@@ -82,7 +82,7 @@
             "divider_color": "#ffffff33",
             "badge_color": "#ffffff",
             "badge_text_color": "#1d3686",
-            "headline": "Design Resources <br> No gatekeeping...",
+            "headline": "Design Resources \n<br>(no gatekeeping...)",
             "headline_alignment": "left",
             "headline_size": 48,
             "headline_max_width": 600,
@@ -275,7 +275,7 @@
         "num_weight": "400",
         "num_size_d": 22,
         "num_size_m": 16,
-        "num_color": "#CFC8BF",
+        "num_color": "#cfc8bf",
         "num_opacity": 0.8
       }
     },
