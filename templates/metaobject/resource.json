@@ -160,7 +160,7 @@
               "type": "button",
               "settings": {
                 "label": "Explore {{ closest.metaobject.resource.name.value }}",
-                "link": "{{ closest.metaobject.resource.system.url }}",
+                "link": "{{ closest.metaobject.resource.link.value }}",
                 "open_in_new_tab": true,
                 "style_class": "button",
                 "width": "fit-content",
