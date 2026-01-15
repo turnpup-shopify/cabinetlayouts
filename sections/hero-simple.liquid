@@ -1,0 +1,721 @@
+{% comment %}
+  Slow Down Section
+  A calming, meditative section with background and centered text
+{% endcomment %}
+
+<div class="slow-down-section" style="
+  margin-top: {{ section.settings.margin_top_desktop }}px;
+  margin-right: {{ section.settings.margin_right_desktop }}px;
+  margin-bottom: {{ section.settings.margin_bottom_desktop }}px;
+  margin-left: {{ section.settings.margin_left_desktop }}px;
+  padding-top: {{ section.settings.padding_top_desktop }}px;
+  padding-right: {{ section.settings.padding_right_desktop }}px;
+  padding-bottom: {{ section.settings.padding_bottom_desktop }}px;
+  padding-left: {{ section.settings.padding_left_desktop }}px;
+  background-color: {{ section.settings.background_color }};
+  {% if section.settings.background_image %}
+    background-image: url('{{ section.settings.background_image | image_url: width: 2000 }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  {% endif %}
+  min-height: {{ section.settings.section_min_height_desktop }}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+">
+  <div class="slow-down-content" style="
+    text-align: {{ section.settings.text_alignment }};
+    max-width: {{ section.settings.content_max_width }}px;
+    width: 100%;
+    padding: 0 20px;
+  ">
+    
+    {% if section.settings.show_asterisk %}
+    <div class="asterisk-text" style="
+      font-family: {{ section.settings.asterisk_font_family }};
+      font-size: {{ section.settings.asterisk_font_size_desktop }}px;
+      color: {{ section.settings.asterisk_color }};
+      font-weight: {{ section.settings.asterisk_font_weight }};
+      margin-bottom: {{ section.settings.asterisk_spacing_desktop }}px;
+      line-height: 1;
+    ">
+      {{ section.settings.asterisk_text }}
+    </div>
+    {% endif %}
+
+    <h2 class="main-text" style="
+      font-family: {{ section.settings.main_font_family }};
+      font-size: {{ section.settings.main_font_size_desktop }}px;
+      color: {{ section.settings.main_color }};
+      font-weight: {{ section.settings.main_font_weight }};
+      margin: 0 0 {{ section.settings.main_spacing_desktop }}px 0;
+      line-height: 1.1;
+    ">
+      {{ section.settings.main_text }}
+    </h2>
+
+    {% if section.settings.show_secondary_text %}
+    <div class="secondary-text-wrapper" style="
+      display: inline-block;
+      border: {{ section.settings.secondary_border_width }}px solid {{ section.settings.secondary_border_color }};
+      border-radius: {{ section.settings.secondary_border_radius }}px;
+      padding: {{ section.settings.secondary_padding_vertical }}px {{ section.settings.secondary_padding_horizontal }}px;
+    ">
+      <p class="secondary-text" style="
+        font-family: {{ section.settings.secondary_font_family }};
+        font-size: {{ section.settings.secondary_font_size_desktop }}px;
+        color: {{ section.settings.secondary_color }};
+        font-weight: {{ section.settings.secondary_font_weight }};
+        margin: 0;
+        line-height: 1.2;
+      ">
+        {{ section.settings.secondary_text }}
+      </p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+  .slow-down-section {
+    transition: all 0.3s ease;
+  }
+
+  @media screen and (max-width: 768px) {
+    .slow-down-section {
+      margin-top: {{ section.settings.margin_top_mobile }}px !important;
+      margin-right: {{ section.settings.margin_right_mobile }}px !important;
+      margin-bottom: {{ section.settings.margin_bottom_mobile }}px !important;
+      margin-left: {{ section.settings.margin_left_mobile }}px !important;
+      padding-top: {{ section.settings.padding_top_mobile }}px !important;
+      padding-right: {{ section.settings.padding_right_mobile }}px !important;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px !important;
+      padding-left: {{ section.settings.padding_left_mobile }}px !important;
+      min-height: {{ section.settings.section_min_height_mobile }}px !important;
+    }
+
+    .asterisk-text {
+      font-size: {{ section.settings.asterisk_font_size_mobile }}px !important;
+      margin-bottom: {{ section.settings.asterisk_spacing_mobile }}px !important;
+    }
+
+    .main-text {
+      font-size: {{ section.settings.main_font_size_mobile }}px !important;
+      margin-bottom: {{ section.settings.main_spacing_mobile }}px !important;
+    }
+
+    .secondary-text {
+      font-size: {{ section.settings.secondary_font_size_mobile }}px !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Slow Down Section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Spacing - Desktop"
+    },
+    {
+      "type": "paragraph",
+      "content": "Control the outer spacing (margin) of the section on desktop devices."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Top (Desktop)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_right_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Right (Desktop)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Bottom (Desktop)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_left_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Left (Desktop)",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing - Mobile"
+    },
+    {
+      "type": "paragraph",
+      "content": "Control the outer spacing (margin) of the section on mobile devices."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_right_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Right (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_left_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Left (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section Padding - Desktop"
+    },
+    {
+      "type": "paragraph",
+      "content": "Control the inner spacing (padding) of the section on desktop devices."
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Desktop)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_right_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Right (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Desktop)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_left_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Left (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Section Padding - Mobile"
+    },
+    {
+      "type": "paragraph",
+      "content": "Control the inner spacing (padding) of the section on mobile devices."
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Right (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Left (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Background Settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "Set the background color and optional background image for the section."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image",
+      "info": "Recommended: High-resolution image (1920x1080 or larger)"
+    },
+    {
+      "type": "range",
+      "id": "section_min_height_desktop",
+      "min": 300,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Minimum Height (Desktop)",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "section_min_height_mobile",
+      "min": 300,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "Minimum Height (Mobile)",
+      "default": 600
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 300,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Content Max Width",
+      "default": 800
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Asterisk Text"
+    },
+    {
+      "type": "paragraph",
+      "content": "The small decorative text that appears above the main heading (e.g., '*')."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_asterisk",
+      "label": "Show Asterisk Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "asterisk_text",
+      "label": "Asterisk Text",
+      "default": "*"
+    },
+    {
+      "type": "text",
+      "id": "asterisk_font_family",
+      "label": "Asterisk Font Family",
+      "default": "Georgia, serif",
+      "info": "Example: 'Arial, sans-serif' or 'Georgia, serif'"
+    },
+    {
+      "type": "range",
+      "id": "asterisk_font_size_desktop",
+      "min": 12,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Asterisk Font Size (Desktop)",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "asterisk_font_size_mobile",
+      "min": 12,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Asterisk Font Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "asterisk_color",
+      "label": "Asterisk Color",
+      "default": "#f5f5dc"
+    },
+    {
+      "type": "select",
+      "id": "asterisk_font_weight",
+      "label": "Asterisk Font Weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "asterisk_spacing_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Asterisk Bottom Spacing (Desktop)",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "asterisk_spacing_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Asterisk Bottom Spacing (Mobile)",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Main Text"
+    },
+    {
+      "type": "paragraph",
+      "content": "The primary heading text (e.g., 'slow down,')."
+    },
+    {
+      "type": "text",
+      "id": "main_text",
+      "label": "Main Text",
+      "default": "slow down,"
+    },
+    {
+      "type": "text",
+      "id": "main_font_family",
+      "label": "Main Font Family",
+      "default": "Georgia, serif",
+      "info": "Example: 'Arial, sans-serif' or 'Georgia, serif'"
+    },
+    {
+      "type": "range",
+      "id": "main_font_size_desktop",
+      "min": 20,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Main Font Size (Desktop)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "main_font_size_mobile",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Main Font Size (Mobile)",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "main_color",
+      "label": "Main Text Color",
+      "default": "#f5f5dc"
+    },
+    {
+      "type": "select",
+      "id": "main_font_weight",
+      "label": "Main Font Weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "main_spacing_desktop",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Main Text Bottom Spacing (Desktop)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "main_spacing_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Main Text Bottom Spacing (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Secondary Text"
+    },
+    {
+      "type": "paragraph",
+      "content": "The supporting text in a bordered container (e.g., 'you're doing fine!')."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_text",
+      "label": "Show Secondary Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "secondary_text",
+      "label": "Secondary Text",
+      "default": "you're doing fine!"
+    },
+    {
+      "type": "text",
+      "id": "secondary_font_family",
+      "label": "Secondary Font Family",
+      "default": "Arial, sans-serif",
+      "info": "Example: 'Arial, sans-serif' or 'Georgia, serif'"
+    },
+    {
+      "type": "range",
+      "id": "secondary_font_size_desktop",
+      "min": 12,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Secondary Font Size (Desktop)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "secondary_font_size_mobile",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Secondary Font Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "secondary_color",
+      "label": "Secondary Text Color",
+      "default": "#f5f5dc"
+    },
+    {
+      "type": "select",
+      "id": "secondary_font_weight",
+      "label": "Secondary Font Weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Secondary Text Border"
+    },
+    {
+      "type": "color",
+      "id": "secondary_border_color",
+      "label": "Border Color",
+      "default": "#f5f5dc"
+    },
+    {
+      "type": "range",
+      "id": "secondary_border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Width",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "secondary_border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Border Radius",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "secondary_padding_vertical",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "secondary_padding_horizontal",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Horizontal Padding",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero - Slow Down"
+    }
+  ]
+}
+{% endschema %}
