@@ -68,16 +68,30 @@
       border-radius: {{ section.settings.secondary_border_radius }}px;
       padding: {{ section.settings.secondary_padding_vertical }}px {{ section.settings.secondary_padding_horizontal }}px;
     ">
-      <p class="secondary-text" style="
-        font-family: {{ section.settings.secondary_font_family }};
-        font-size: {{ section.settings.secondary_font_size_desktop }}px;
-        color: {{ section.settings.secondary_color }};
-        font-weight: {{ section.settings.secondary_font_weight }};
-        margin: 0;
-        line-height: 1.2;
-      ">
-        {{ section.settings.secondary_text }}
-      </p>
+      {% if section.settings.secondary_link != blank %}
+        <a class="secondary-text secondary-text-link" href="{{ section.settings.secondary_link }}" style="
+          font-family: {{ section.settings.secondary_font_family }};
+          font-size: {{ section.settings.secondary_font_size_desktop }}px;
+          color: {{ section.settings.secondary_color }};
+          font-weight: {{ section.settings.secondary_font_weight }};
+          line-height: 1.2;
+          text-decoration: none;
+          display: inline-block;
+        ">
+          {{ section.settings.secondary_text }}
+        </a>
+      {% else %}
+        <span class="secondary-text" style="
+          font-family: {{ section.settings.secondary_font_family }};
+          font-size: {{ section.settings.secondary_font_size_desktop }}px;
+          color: {{ section.settings.secondary_color }};
+          font-weight: {{ section.settings.secondary_font_weight }};
+          line-height: 1.2;
+          display: inline-block;
+        ">
+          {{ section.settings.secondary_text }}
+        </span>
+      {% endif %}
     </div>
     {% endif %}
 
@@ -129,6 +143,10 @@
 
     .secondary-text {
       font-size: {{ section.settings.secondary_font_size_mobile }}px !important;
+    }
+
+    .secondary-text-link:hover {
+      opacity: 0.85;
     }
   }
 </style>
@@ -624,6 +642,12 @@
       "id": "secondary_text",
       "label": "Secondary Text",
       "default": "you're doing fine!"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary Button Link",
+      "info": "Optional. When set, the secondary text becomes a button link."
     },
     {
       "type": "text",
