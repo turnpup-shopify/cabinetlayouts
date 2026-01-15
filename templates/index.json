@@ -31,6 +31,7 @@
         "padding_left_mobile": 20,
         "background_color": "#000000",
         "background_image": "shopify://shop_images/06d8ef1b-93c6-4366-95e8-d06663e5993c.png",
+        "background_video": "shopify://files/videos/592470d2-5ff9-4e28-a818-45fa383c370d.mp4",
         "section_min_height_desktop": 800,
         "section_min_height_mobile": 600,
         "content_max_width": 800,
