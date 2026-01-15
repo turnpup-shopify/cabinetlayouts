@@ -297,7 +297,7 @@
         "show_search": true,
         "search_placeholder": "Search",
         "show_filters": true,
-        "use_csv": false,
+        "use_csv": true,
         "csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYsgxyxsdEiWFKiaFSKIxWuYU6X4XWuJLsAnhGXUZGG8bYVMsjZXlDJSBZMQp_MrpIx5MbtWiSqrue/pub?output=csv"
       }
     },
