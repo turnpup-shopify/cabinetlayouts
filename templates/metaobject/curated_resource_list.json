@@ -63,7 +63,7 @@
             "group_iMhkig": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "{{ closest.metaobject.curated_resource_list.system.url }}",
                 "open_in_new_tab": false,
                 "content_direction": "column",
                 "vertical_on_mobile": true,
