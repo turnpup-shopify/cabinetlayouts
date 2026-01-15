@@ -1,6 +1,1351 @@
+{% doc %}
+  @prompt
+    What this module is
+    
+    A full width “Locations list” section.
+    
+    Solid background color (blue in the example)
+    
+    Big stacked headline at top
+    
+    A vertical list of locations
+    
+    Each row has, left, the city and region
+    
+    Right side has a multi line address block
+    
+    Far right has a jobs badge, “Jobs” label, and a link arrow
+    
+    Rows are separated by thin divider lines
+    
+    Editable fields you want in Shopify (section settings)
+    Section level
+    
+    Background color
+    
+    Text color
+    
+    Divider line color
+    
+    Max width (full bleed vs contained)
+    
+    Top padding and bottom padding
+    
+    Headline
+    
+    Headline max width (so it wraps like the example)
+    
+    Headline alignment (center, left)
+    
+    Headline size and letter spacing (optional)
+    
+    Row vertical padding (how tall each row feels)
+    
+    Global link behavior (optional)
+    
+    Row click behavior (link only on the Jobs area, or the entire row is clickable)
+    
+    Open links in new tab (checkbox)
+    
+    Repeatable fields per location (blocks)
+    
+    Use a block for each office.
+    
+    Required block fields
+    
+    City label (example, “Calgary, AB”)
+    
+    Address line 1 (street)
+    
+    Address line 2 (suite, floor, unit)
+    
+    Address line 3 (city, region)
+    
+    Address line 4 (postal, country)
+    
+    Jobs count (number inside the circle badge)
+    
+    Jobs label text (default “Jobs”, but editable)
+    
+    Primary link URL (where the Jobs link goes, could be a careers search filtered to that location)
+    
+    Link aria label (accessibility, ex “View jobs in Calgary”)
+    
+    Optional block fields
+    
+    Show jobs count (toggle)
+    
+    Custom badge color (if you ever want to vary it)
+    
+    Secondary link URL (if you want the city text to go to a location page, separate from the jobs link)
+    
+    Location slug or ID (hidden style field, useful if you build URLs dynamically)
+    
+    Data structure recommendation
+    
+    Section settings for the headline and styling.
+    
+    Blocks for each office row, so you can add, remove, reorder, and edit all rows in the theme editor.
+    
+    Each block holds all text plus the one link you care about (jobs URL). If you want two links, add the optional secondary URL.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-locations-list-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding-top: {{ block.settings.padding_top }}px;
+    padding-bottom: {{ block.settings.padding_bottom }}px;
+  }
+
+  .ai-locations-list__container-{{ ai_gen_id }} {
+    {% if block.settings.max_width == 'contained' %}
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    {% else %}
+      width: 100%;
+    {% endif %}
+  }
+
+  .ai-locations-list__headline-wrapper-{{ ai_gen_id }} {
+    {% if block.settings.headline_alignment == 'center' %}
+      display: flex;
+      justify-content: center;
+    {% elsif block.settings.headline_alignment == 'left' %}
+      display: flex;
+      justify-content: flex-start;
+    {% endif %}
+    margin-bottom: 40px;
+    {% if block.settings.max_width == 'full' %}
+      padding-left: 20px;
+      padding-right: 20px;
+    {% endif %}
+  }
+
+  .ai-locations-list__headline-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.headline_size }}px;
+    letter-spacing: {{ block.settings.headline_letter_spacing }}px;
+    line-height: 1.2;
+    margin: 0;
+    max-width: {{ block.settings.headline_max_width }}px;
+    text-align: {{ block.settings.headline_alignment }};
+  }
+
+  .ai-locations-list__items-{{ ai_gen_id }} {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ai-locations-list__item-{{ ai_gen_id }} {
+    border-bottom: 1px solid {{ block.settings.divider_color }};
+    {% if block.settings.max_width == 'full' %}
+      padding-left: 20px;
+      padding-right: 20px;
+    {% endif %}
+  }
+
+  .ai-locations-list__item-{{ ai_gen_id }}:last-child {
+    border-bottom: none;
+  }
+
+  .ai-locations-list__item-content-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 20px;
+    align-items: center;
+    padding-top: {{ block.settings.row_padding }}px;
+    padding-bottom: {{ block.settings.row_padding }}px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ai-locations-list__item-link-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 20px;
+    align-items: center;
+    padding-top: {{ block.settings.row_padding }}px;
+    padding-bottom: {{ block.settings.row_padding }}px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .ai-locations-list__city-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .ai-locations-list__city-link-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    text-decoration: none;
+  }
+
+  .ai-locations-list__city-link-{{ ai_gen_id }}:hover {
+    text-decoration: underline;
+  }
+
+  .ai-locations-list__address-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .ai-locations-list__address-line-{{ ai_gen_id }} {
+    display: block;
+  }
+
+  .ai-locations-list__jobs-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-locations-list__jobs-link-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .ai-locations-list__badge-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: {{ block.settings.badge_color }};
+    color: {{ block.settings.badge_text_color }};
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ai-locations-list__jobs-label-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .ai-locations-list__arrow-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    color: {{ block.settings.text_color }};
+    flex-shrink: 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-locations-list__item-content-{{ ai_gen_id }},
+    .ai-locations-list__item-link-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .ai-locations-list__headline-{{ ai_gen_id }} {
+      font-size: {{ block.settings.headline_size | times: 0.6 }}px;
+    }
+
+    .ai-locations-list__jobs-wrapper-{{ ai_gen_id }},
+    .ai-locations-list__jobs-link-{{ ai_gen_id }} {
+      justify-content: flex-start;
+    }
+  }
+{% endstyle %}
+
+<locations-list-{{ ai_gen_id }} class="ai-locations-list-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-locations-list__container-{{ ai_gen_id }}">
+    {% if block.settings.headline != blank %}
+      <div class="ai-locations-list__headline-wrapper-{{ ai_gen_id }}">
+        <h2 class="ai-locations-list__headline-{{ ai_gen_id }}">{{ block.settings.headline }}</h2>
+      </div>
+    {% endif %}
+
+    <ul class="ai-locations-list__items-{{ ai_gen_id }}">
+      {% for i in (1..10) %}
+        {% assign city_key = 'location_' | append: i | append: '_city' %}
+        {% assign address1_key = 'location_' | append: i | append: '_address_1' %}
+        {% assign address2_key = 'location_' | append: i | append: '_address_2' %}
+        {% assign address3_key = 'location_' | append: i | append: '_address_3' %}
+        {% assign address4_key = 'location_' | append: i | append: '_address_4' %}
+        {% assign jobs_count_key = 'location_' | append: i | append: '_jobs_count' %}
+        {% assign jobs_label_key = 'location_' | append: i | append: '_jobs_label' %}
+        {% assign primary_link_key = 'location_' | append: i | append: '_primary_link' %}
+        {% assign secondary_link_key = 'location_' | append: i | append: '_secondary_link' %}
+        {% assign aria_label_key = 'location_' | append: i | append: '_aria_label' %}
+        {% assign show_jobs_key = 'location_' | append: i | append: '_show_jobs' %}
+        {% assign custom_badge_key = 'location_' | append: i | append: '_custom_badge' %}
+
+        {% assign city = block.settings[city_key] %}
+        {% assign address1 = block.settings[address1_key] %}
+        {% assign address2 = block.settings[address2_key] %}
+        {% assign address3 = block.settings[address3_key] %}
+        {% assign address4 = block.settings[address4_key] %}
+        {% assign jobs_count = block.settings[jobs_count_key] %}
+        {% assign jobs_label = block.settings[jobs_label_key] %}
+        {% assign primary_link = block.settings[primary_link_key] %}
+        {% assign secondary_link = block.settings[secondary_link_key] %}
+        {% assign aria_label = block.settings[aria_label_key] %}
+        {% assign show_jobs = block.settings[show_jobs_key] %}
+        {% assign custom_badge = block.settings[custom_badge_key] %}
+
+        {% if city != blank %}
+          <li class="ai-locations-list__item-{{ ai_gen_id }}">
+            {% if block.settings.row_click_behavior == 'full_row' and primary_link != blank %}
+              <a
+                href="{{ primary_link }}"
+                class="ai-locations-list__item-link-{{ ai_gen_id }}"
+                aria-label="{{ aria_label }}"
+                {% if block.settings.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+              >
+                <div>
+                  <h3 class="ai-locations-list__city-{{ ai_gen_id }}">{{ city }}</h3>
+                </div>
+
+                <div class="ai-locations-list__address-{{ ai_gen_id }}">
+                  {% if address1 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address1 }}</span>
+                  {% endif %}
+                  {% if address2 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address2 }}</span>
+                  {% endif %}
+                  {% if address3 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address3 }}</span>
+                  {% endif %}
+                  {% if address4 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address4 }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="ai-locations-list__jobs-wrapper-{{ ai_gen_id }}">
+                  {% if show_jobs %}
+                    <div
+                      class="ai-locations-list__badge-{{ ai_gen_id }}"
+                      {% if custom_badge != blank %}
+                        style="background-color: {{ custom_badge }};"
+                      {% endif %}
+                    >
+                      {{ jobs_count }}
+                    </div>
+                  {% endif %}
+
+                  <span class="ai-locations-list__jobs-label-{{ ai_gen_id }}">{{ jobs_label }}</span>
+
+                  <svg class="ai-locations-list__arrow-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </div>
+              </a>
+            {% else %}
+              <div class="ai-locations-list__item-content-{{ ai_gen_id }}">
+                <div>
+                  {% if secondary_link != blank %}
+                    <a href="{{ secondary_link }}" class="ai-locations-list__city-link-{{ ai_gen_id }}" {% if block.settings.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                      <h3 class="ai-locations-list__city-{{ ai_gen_id }}">{{ city }}</h3>
+                    </a>
+                  {% else %}
+                    <h3 class="ai-locations-list__city-{{ ai_gen_id }}">{{ city }}</h3>
+                  {% endif %}
+                </div>
+
+                <div class="ai-locations-list__address-{{ ai_gen_id }}">
+                  {% if address1 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address1 }}</span>
+                  {% endif %}
+                  {% if address2 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address2 }}</span>
+                  {% endif %}
+                  {% if address3 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address3 }}</span>
+                  {% endif %}
+                  {% if address4 != blank %}
+                    <span class="ai-locations-list__address-line-{{ ai_gen_id }}">{{ address4 }}</span>
+                  {% endif %}
+                </div>
+
+                {% if primary_link != blank %}
+                  <a
+                    href="{{ primary_link }}"
+                    class="ai-locations-list__jobs-link-{{ ai_gen_id }}"
+                    aria-label="{{ aria_label }}"
+                    {% if block.settings.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                  >
+                    {% if show_jobs %}
+                      <div
+                        class="ai-locations-list__badge-{{ ai_gen_id }}"
+                        {% if custom_badge != blank %}
+                          style="background-color: {{ custom_badge }};"
+                        {% endif %}
+                      >
+                        {{ jobs_count }}
+                      </div>
+                    {% endif %}
+
+                    <span class="ai-locations-list__jobs-label-{{ ai_gen_id }}">{{ jobs_label }}</span>
+
+                    <svg class="ai-locations-list__arrow-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </a>
+                {% else %}
+                  <div class="ai-locations-list__jobs-wrapper-{{ ai_gen_id }}">
+                    {% if show_jobs %}
+                      <div
+                        class="ai-locations-list__badge-{{ ai_gen_id }}"
+                        {% if custom_badge != blank %}
+                          style="background-color: {{ custom_badge }};"
+                        {% endif %}
+                      >
+                        {{ jobs_count }}
+                      </div>
+                    {% endif %}
+
+                    <span class="ai-locations-list__jobs-label-{{ ai_gen_id }}">{{ jobs_label }}</span>
+
+                    <svg class="ai-locations-list__arrow-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+</locations-list-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class LocationsList{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+      }
+    }
+
+    customElements.define('locations-list-{{ ai_gen_id }}', LocationsList{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Locations list",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "max_width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full bleed"
+        },
+        {
+          "value": "contained",
+          "label": "Contained"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#1d3686"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider",
+      "default": "#ffffff33"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Badge background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#1d3686"
+    },
+    {
+      "type": "header",
+      "content": "Headline"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Our locations around the world"
+    },
+    {
+      "type": "select",
+      "id": "headline_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "headline_max_width",
+      "min": 300,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "Max width",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "headline_letter_spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Letter spacing",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Rows"
+    },
+    {
+      "type": "range",
+      "id": "row_padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "row_click_behavior",
+      "label": "Click behavior",
+      "options": [
+        {
+          "value": "jobs_only",
+          "label": "Jobs area only"
+        },
+        {
+          "value": "full_row",
+          "label": "Full row clickable"
+        }
+      ],
+      "default": "jobs_only"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open links in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Location 1"
+    },
+    {
+      "type": "text",
+      "id": "location_1_city",
+      "label": "City and region",
+      "default": "Calgary, AB"
+    },
+    {
+      "type": "text",
+      "id": "location_1_address_1",
+      "label": "Address line 1",
+      "default": "123 Main Street"
+    },
+    {
+      "type": "text",
+      "id": "location_1_address_2",
+      "label": "Address line 2",
+      "default": "Suite 400"
+    },
+    {
+      "type": "text",
+      "id": "location_1_address_3",
+      "label": "Address line 3",
+      "default": "Calgary, AB"
+    },
+    {
+      "type": "text",
+      "id": "location_1_address_4",
+      "label": "Address line 4",
+      "default": "T2P 1J9, Canada"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_1_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_1_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "location_1_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_1_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_1_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_1_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in Calgary"
+    },
+    {
+      "type": "color",
+      "id": "location_1_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 2"
+    },
+    {
+      "type": "text",
+      "id": "location_2_city",
+      "label": "City and region",
+      "default": "Toronto, ON"
+    },
+    {
+      "type": "text",
+      "id": "location_2_address_1",
+      "label": "Address line 1",
+      "default": "456 Bay Street"
+    },
+    {
+      "type": "text",
+      "id": "location_2_address_2",
+      "label": "Address line 2",
+      "default": "Floor 12"
+    },
+    {
+      "type": "text",
+      "id": "location_2_address_3",
+      "label": "Address line 3",
+      "default": "Toronto, ON"
+    },
+    {
+      "type": "text",
+      "id": "location_2_address_4",
+      "label": "Address line 4",
+      "default": "M5H 2Y4, Canada"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_2_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_2_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "location_2_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_2_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_2_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_2_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in Toronto"
+    },
+    {
+      "type": "color",
+      "id": "location_2_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 3"
+    },
+    {
+      "type": "text",
+      "id": "location_3_city",
+      "label": "City and region",
+      "default": "Vancouver, BC"
+    },
+    {
+      "type": "text",
+      "id": "location_3_address_1",
+      "label": "Address line 1",
+      "default": "789 Granville Street"
+    },
+    {
+      "type": "text",
+      "id": "location_3_address_2",
+      "label": "Address line 2",
+      "default": "Unit 200"
+    },
+    {
+      "type": "text",
+      "id": "location_3_address_3",
+      "label": "Address line 3",
+      "default": "Vancouver, BC"
+    },
+    {
+      "type": "text",
+      "id": "location_3_address_4",
+      "label": "Address line 4",
+      "default": "V6C 1T2, Canada"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_3_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_3_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "location_3_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_3_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_3_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_3_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in Vancouver"
+    },
+    {
+      "type": "color",
+      "id": "location_3_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 4"
+    },
+    {
+      "type": "text",
+      "id": "location_4_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_4_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_4_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_4_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_4_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_4_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_4_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_4_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_4_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_4_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_4_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_4_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 5"
+    },
+    {
+      "type": "text",
+      "id": "location_5_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_5_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_5_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_5_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_5_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_5_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_5_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_5_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_5_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_5_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_5_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_5_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 6"
+    },
+    {
+      "type": "text",
+      "id": "location_6_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_6_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_6_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_6_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_6_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_6_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_6_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_6_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_6_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_6_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_6_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_6_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 7"
+    },
+    {
+      "type": "text",
+      "id": "location_7_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_7_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_7_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_7_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_7_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_7_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_7_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_7_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_7_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_7_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_7_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_7_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 8"
+    },
+    {
+      "type": "text",
+      "id": "location_8_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_8_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_8_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_8_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_8_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_8_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_8_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_8_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_8_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_8_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_8_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_8_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 9"
+    },
+    {
+      "type": "text",
+      "id": "location_9_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_9_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_9_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_9_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_9_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_9_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_9_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_9_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_9_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_9_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_9_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_9_custom_badge",
+      "label": "Custom badge color"
+    },
+    {
+      "type": "header",
+      "content": "Location 10"
+    },
+    {
+      "type": "text",
+      "id": "location_10_city",
+      "label": "City and region"
+    },
+    {
+      "type": "text",
+      "id": "location_10_address_1",
+      "label": "Address line 1"
+    },
+    {
+      "type": "text",
+      "id": "location_10_address_2",
+      "label": "Address line 2"
+    },
+    {
+      "type": "text",
+      "id": "location_10_address_3",
+      "label": "Address line 3"
+    },
+    {
+      "type": "text",
+      "id": "location_10_address_4",
+      "label": "Address line 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "location_10_show_jobs",
+      "label": "Show jobs count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "location_10_jobs_count",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Jobs count",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "location_10_jobs_label",
+      "label": "Jobs label",
+      "default": "Jobs"
+    },
+    {
+      "type": "url",
+      "id": "location_10_primary_link",
+      "label": "Primary link URL"
+    },
+    {
+      "type": "url",
+      "id": "location_10_secondary_link",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "text",
+      "id": "location_10_aria_label",
+      "label": "Link aria label",
+      "default": "View jobs in this location"
+    },
+    {
+      "type": "color",
+      "id": "location_10_custom_badge",
+      "label": "Custom badge color"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Locations list"
+    }
+  ]
+}
 {% endschema %}
